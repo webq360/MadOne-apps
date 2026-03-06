@@ -18,6 +18,7 @@ import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
@@ -49,19 +50,38 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     super.initState();
   }
 
-  void getConnectivity(BuildContext context) =>
-      subscription = Connectivity().onConnectivityChanged.listen(
-        (ConnectivityResult result) async {
-          isDeviceConnected = await InternetConnectionChecker().hasConnection;
-          if (!isDeviceConnected && !isAlertSet) {
-            showDialogBox(context);
-            setState(() => isAlertSet = true);
-          } else if (isDeviceConnected && isAlertSet) {
-            Navigator.pop(context);
-            setState(() => isAlertSet = false);
-          }
-        },
-      );
+  // void getConnectivity(BuildContext context) =>
+  //     subscription = Connectivity().onConnectivityChanged.listen(
+  //       (ConnectivityResult result) async {
+  //         isDeviceConnected = await InternetConnectionChecker().hasConnection;
+  //         if (!isDeviceConnected && !isAlertSet) {
+  //           showDialogBox(context);
+  //           setState(() => isAlertSet = true);
+  //         } else if (isDeviceConnected && isAlertSet) {
+  //           Navigator.pop(context);
+  //           setState(() => isAlertSet = false);
+  //         }
+  //       },
+  //     );
+
+  void getConnectivity(BuildContext context) {
+    subscription = Connectivity().onConnectivityChanged.listen((results) {
+      // results is a List<ConnectivityResult>
+      if (results.contains(ConnectivityResult.wifi)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Connected to WiFi")),
+        );
+      } else if (results.contains(ConnectivityResult.mobile)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Connected to Mobile Network")),
+        );
+      } else if (results.contains(ConnectivityResult.none) || results.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No Internet Connection")),
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -153,7 +173,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
               onPressed: () async {
                 Navigator.pop(context, 'Cancel');
                 isDeviceConnected =
-                    await InternetConnectionChecker().hasConnection;
+                   await InternetConnectionChecker.createInstance().hasConnection;
                 if (!isDeviceConnected) {
                   showDialogBox(context);
                   setState(() => isAlertSet = true);
