@@ -34,6 +34,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
     super.initState();
     _checkNetworkAndLoggedIn();
   }
+
   // Modify fetchWishlist() to include timestamp for each item
   Future<void> fetchWishlist() async {
     try {
@@ -46,20 +47,20 @@ class _WishlistScreenState extends State<WishlistScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
-          _wishlistItems = List<Map<String, dynamic>>.from(responseData['data']).map((item) {
+          _wishlistItems =
+              List<Map<String, dynamic>>.from(responseData['data']).map((item) {
             return {...item, 'timestamp': DateTime.now()};
           }).toList();
         });
         // Sort the wishlist items based on the timestamp, with the latest added item appearing first
         _wishlistItems.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
       }
-     
     } catch (error) {
       print('Error: $error');
       // Display a message to the user
@@ -69,13 +70,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
           duration: Duration(seconds: 2),
         ),
       );
-    }
-    finally {
+    } finally {
       setState(() {
         isLoading = false;
       });
     }
   }
+
   // Add this function to handle deletion of items from the wishlist
   Future<void> removeFromWishlist(int wishlistId) async {
     try {
@@ -84,7 +85,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
         print('Authorization token is missing.');
         return;
       }
-      final Uri url = Uri.parse('https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+      final Uri url = Uri.parse(
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -96,11 +98,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
           _wishlistItems.removeWhere((item) => item['id'] == wishlistId);
         });
       } else {
-        print('Failed to remove product from wishlist. Status code: ${response.statusCode}');
+        print(
+            'Failed to remove product from wishlist. Status code: ${response.statusCode}');
         // Display a message to the user
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to remove product from wishlist. Please try again later.'),
+            content: Text(
+                'Failed to remove product from wishlist. Please try again later.'),
             duration: Duration(seconds: 2),
           ),
         );
@@ -116,13 +120,14 @@ class _WishlistScreenState extends State<WishlistScreen> {
       );
     }
   }
+
   void addToCart(int index) {
     var cartProvider = Provider.of<CartProvider>(context, listen: false);
     var productData = _wishlistItems[index]['product'];
 
     if (productData != null) {
       var existingItem = cartItems.firstWhere(
-            (item) => item.name == productData['name'],
+        (item) => item.name == productData['name'],
         orElse: () => CartItem(
           id: 0,
           image: 'default_image_path',
@@ -136,7 +141,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
       );
 
       if (existingItem.quantity > 0) {
-        cartProvider.updateCartItemQuantity(existingItem, existingItem.quantity);
+        cartProvider.updateCartItemQuantity(
+            existingItem, existingItem.quantity);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Container(
@@ -149,7 +155,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     onPressed: () {
                       Get.to(const CartScreen());
                     },
-                    child: const Text('View', style: TextStyle(color: Colors.yellow)),
+                    child: const Text('View',
+                        style: TextStyle(color: Colors.yellow)),
                   )
                 ],
               ),
@@ -163,7 +170,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
           image: productData['image'] ?? 'default_image_path',
           name: productData['name'] ?? 'Unknown Product',
           sell_price: double.tryParse('${productData['sell_price']}') ?? 0.0,
-          after_discount_price: double.tryParse('${productData['after_discount_price']}') ?? 0.0,
+          after_discount_price:
+              double.tryParse('${productData['after_discount_price']}') ?? 0.0,
           subtitle: productData['subtitle'] ?? 'Unknown Subtitle',
           company_name: productData['brand']['brand_name'] ?? 'Unknown Company',
           quantity: 1,
@@ -183,7 +191,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     onPressed: () {
                       Get.to(const CartScreen());
                     },
-                    child: const Text('View', style: TextStyle(color: Colors.yellow)),
+                    child: const Text('View',
+                        style: TextStyle(color: Colors.yellow)),
                   )
                 ],
               ),
@@ -200,6 +209,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       );
     }
   }
+
   Future<void> _handleTokenRefresh(Function onRefreshComplete) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? refreshToken = prefs.getString('refreshToken');
@@ -221,12 +231,14 @@ class _WishlistScreenState extends State<WishlistScreen> {
       }
     }
   }
+
   Future<String?> _getAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
+
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
 
     try {
       final response = await http.post(
@@ -237,7 +249,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final Map<String, dynamic> authorization = responseData['authorization'];
+        final Map<String, dynamic> authorization =
+            responseData['authorization'];
         return authorization['token'];
       } else {
         return null;
@@ -247,6 +260,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       return null;
     }
   }
+
   Future<void> _checkNetworkAndLoggedIn() async {
     bool hasNetwork = await checkNetwork();
     bool userLoggedIn = await isLoggedIn();
@@ -257,6 +271,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       Get.to(() => const NetworkCheckScreen());
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -287,129 +302,157 @@ class _WishlistScreenState extends State<WishlistScreen> {
             child: isLoading
                 ? const ShimmerWidget()
                 : Column(
-              children: _wishlistItems.asMap().entries.map((MapEntry<int, Map<String, dynamic>> entry) {
-                final int index = entry.key;
-                final Map<String, dynamic> item = entry.value;
-                final Map<String, dynamic>? productData = item['product'];
-                if (productData != null) {
-                  return InkWell(
-                    onTap: (){
-                      Get.to(ProductDetailsScreen(productDetails: productData));
-                    },
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 10.h),
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 11.h),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xff8AB9FF)),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 95.h,
-                            width: MediaQuery.of(context).size.width * 0.25,
+                    children: _wishlistItems
+                        .asMap()
+                        .entries
+                        .map((MapEntry<int, Map<String, dynamic>> entry) {
+                      final int index = entry.key;
+                      final Map<String, dynamic> item = entry.value;
+                      final Map<String, dynamic>? productData = item['product'];
+                      if (productData != null) {
+                        return InkWell(
+                          onTap: () {
+                            Get.to(ProductDetailsScreen(
+                                productDetails: productData));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 10.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10.w, vertical: 11.h),
+                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: const Color(0xff8AB9FF),
-                              borderRadius: BorderRadius.circular(5.r),
+                              border:
+                                  Border.all(color: const Color(0xff8AB9FF)),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(5.r),
-                              child: Image.network(
-                                productData['image'] ?? '', // Use product image URL
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    ImageAssets.productJPG,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${productData['name'].split(' ').take(3).join(' ')} - ${productData['brand']['brand_name'].split(' ').first ?? ''}',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
-                              ),
-                              Row(
-                              //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '৳${productData['after_discount_price'] ?? ''}',
-                                    style: TextStyle(fontSize: 12.sp, color: Colors.green),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 95.h,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff8AB9FF),
+                                    borderRadius: BorderRadius.circular(5.r),
                                   ),
-                                  SizedBox(width: 80.w,),
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                          onTap: () {
-                                            // Call the function to remove the item from the wishlist
-                                            removeFromWishlist(item['id'] as int);
-                                          },
-                                          child: const Icon(Icons.delete, color: Colors.red,size: 32,)),
-                                      InkWell(
-                                        onTap: () async {
-                                          try {
-                                            addToCart(index);
-                                            // Remove the product from the wishlist
-                                            await removeFromWishlist(item['id'] as int);
-                                            // ScaffoldMessenger.of(context).showSnackBar(
-                                            //   SnackBar(
-                                            //     content: Text('Product added to cart and removed from wishlist'),
-                                            //     duration: Duration(seconds: 2),
-                                            //   ),
-                                            // );
-                                          } catch (error) {
-                                            print('Error: $error');
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('An error occurred. Please try again later.'),
-                                                duration: Duration(seconds: 2),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(30),
-                                            color: ColorPalette.primaryColor,
-                                          ),
-                                          child: const Icon(
-                                            Icons.shopping_cart,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              Text(
-                                '৳${productData['sell_price'] ?? ''}',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(5.r),
+                                    child: Image.network(
+                                      productData['image'] ??
+                                          '', // Use product image URL
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          ImageAssets.productJPG,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 16.w),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${productData['name'].split(' ').take(3).join(' ')} - ${productData['brand']['brand_name'].split(' ').first ?? ''}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Row(
+                                      //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '৳${productData['after_discount_price'] ?? ''}',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              color: Colors.green),
+                                        ),
+                                        SizedBox(
+                                          width: 80.w,
+                                        ),
+                                        Row(
+                                          children: [
+                                            InkWell(
+                                                onTap: () {
+                                                  // Call the function to remove the item from the wishlist
+                                                  removeFromWishlist(
+                                                      item['id'] as int);
+                                                },
+                                                child: const Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
+                                                  size: 32,
+                                                )),
+                                            InkWell(
+                                              onTap: () async {
+                                                try {
+                                                  addToCart(index);
+                                                  // Remove the product from the wishlist
+                                                  await removeFromWishlist(
+                                                      item['id'] as int);
+                                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                                  //   SnackBar(
+                                                  //     content: Text('Product added to cart and removed from wishlist'),
+                                                  //     duration: Duration(seconds: 2),
+                                                  //   ),
+                                                  // );
+                                                } catch (error) {
+                                                  print('Error: $error');
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          'An error occurred. Please try again later.'),
+                                                      duration:
+                                                          Duration(seconds: 2),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  color:
+                                                      ColorPalette.primaryColor,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.shopping_cart,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                    Text(
+                                      '৳${productData['sell_price'] ?? ''}',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.grey,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return const SizedBox.shrink(); // Skip rendering if product data is null
-                }
-              }).toList(),
-            ),
+                        );
+                      } else {
+                        return const SizedBox
+                            .shrink(); // Skip rendering if product data is null
+                      }
+                    }).toList(),
+                  ),
           ),
         ),
       ),

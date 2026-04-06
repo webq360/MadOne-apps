@@ -59,7 +59,7 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api//wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -91,8 +91,8 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
     inProgress = true;
     setState(() {});
     try {
-      final response =
-          await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
+      final response = await http
+          .get(Uri.parse('https://stage.medone.primeharvestbd.com/api/'));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (mounted) {
@@ -121,7 +121,8 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
     if (accessToken != null) {
       try {
         final response = await http.get(
-          Uri.parse('https://app.omnicare.com.bd/api/addToWishlist/$productId'),
+          Uri.parse(
+              'https://stage.medone.primeharvestbd.com/api//addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -165,7 +166,7 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api//removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -243,7 +244,8 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl =
+        'https://stage.medone.primeharvestbd.com/api//refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),

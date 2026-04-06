@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "405933261223",
+    "project_id": "medone-3c157",
+    "storage_bucket": "medone-3c157.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405933261223:android:2429ccb6eeadb9f0f17682",
+        "android_client_info": {
+          "package_name": "com.sarkarit.omnicare_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfeDXROjeVDkdspw1wl4qY2JHI-T3VZts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

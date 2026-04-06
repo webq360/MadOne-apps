@@ -39,7 +39,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Future<void> _fetchPhoneNumber() async {
-    const apiUrl = "https://app.omnicare.com.bd/api/settings";
+    const apiUrl = "https://stage.medone.primeharvestbd.com/api/settings";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -86,8 +86,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Future<void> _checkForNewNotifications() async {
     try {
-      final response =
-          await http.get(Uri.parse("https://app.omnicare.com.bd/api/settings"));
+      final response = await http.get(
+          Uri.parse("https://stage.medone.primeharvestbd.com/api/settings"));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> siteSettings = data['site_settigs'];
@@ -153,7 +153,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ///search bar
             SizedBox(
               height: 40,
-             width: 130,
+              width: 130,
               child: TextButton(
                 onPressed: () {
                   Get.to(() => const SearchedProductScreen());

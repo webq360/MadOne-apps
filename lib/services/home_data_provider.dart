@@ -20,7 +20,8 @@ class HomeDataProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
+      final response = await http
+          .get(Uri.parse('https://stage.medone.primeharvestbd.com/api'));
       final json = jsonDecode(response.body);
       sliderList = json['sliders'];
       bannerList = json['site_settigs'];

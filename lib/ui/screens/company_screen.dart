@@ -34,8 +34,8 @@ class _CompanyScreenState extends State<CompanyScreen> {
       setState(() {
         isLoading = true;
       });
-      final response = await http
-          .get(Uri.parse('https://app.omnicare.com.bd/api/all_brands'));
+      final response = await http.get(
+          Uri.parse('https://stage.medone.primeharvestbd.com/api/all_brands'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);

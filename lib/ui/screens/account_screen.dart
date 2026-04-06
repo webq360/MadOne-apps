@@ -21,6 +21,7 @@ class AccountScreen extends StatefulWidget {
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
+
 class _AccountScreenState extends State<AccountScreen> {
   bool isLoading = false;
   File? _image; // Variable to store the selected image
@@ -40,7 +41,7 @@ class _AccountScreenState extends State<AccountScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/profile'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/profile'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print('Fetch Store Name status code: ${response.statusCode}');
@@ -66,14 +67,15 @@ class _AccountScreenState extends State<AccountScreen> {
         await _handleTokenRefresh(fetchStoreName);
       } else {
         // Handle API error
-        print('Failed to fetch store name. Status code: ${response.statusCode}');
+        print(
+            'Failed to fetch store name. Status code: ${response.statusCode}');
       }
     } catch (error) {
       // Handle network errors or unexpected situations
       print('Error during store name fetch: $error');
     }
-
   }
+
   // Function to handle token refresh
   Future<void> _handleTokenRefresh(Function onRefreshComplete) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -96,14 +98,16 @@ class _AccountScreenState extends State<AccountScreen> {
       }
     }
   }
+
   // Function to get the current access token
   Future<String?> _getAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
+
   // Function to refresh the access token
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    final String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -124,6 +128,7 @@ class _AccountScreenState extends State<AccountScreen> {
       return null;
     }
   }
+
   // Add a method to handle user logout
   Future<void> _logout() async {
     try {
@@ -134,7 +139,7 @@ class _AccountScreenState extends State<AccountScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/logout'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/logout'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
 
@@ -143,7 +148,8 @@ class _AccountScreenState extends State<AccountScreen> {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove('accessToken');
         await prefs.remove('refreshToken');
-        Get.offAll(const LoginScreen()); // Replace LoginScreen with your login screen widget
+        Get.offAll(
+            const LoginScreen()); // Replace LoginScreen with your login screen widget
       } else {
         print('Failed to logout. Status code: ${response.statusCode}');
       }
@@ -157,6 +163,7 @@ class _AccountScreenState extends State<AccountScreen> {
     super.initState();
     fetchStoreName();
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -169,10 +176,20 @@ class _AccountScreenState extends State<AccountScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: ColorPalette.primaryColor,
-          leading: IconButton(onPressed: (){
-            Get.offAll(const BottomNavBarScreen());
-          }, icon: const Icon(Icons.arrow_back,color: Colors.white,)),
-          title: const Text('Profile', style: TextStyle(color: Colors.white),),centerTitle: true,),
+          leading: IconButton(
+              onPressed: () {
+                Get.offAll(const BottomNavBarScreen());
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+          title: const Text(
+            'Profile',
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+        ),
         body: RefreshIndicator(
           onRefresh: () async {
             await fetchStoreName();
@@ -180,7 +197,7 @@ class _AccountScreenState extends State<AccountScreen> {
           child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
-              child:  Column(
+              child: Column(
                 children: [
                   Container(
                     padding: EdgeInsets.all(16.w),
@@ -193,10 +210,14 @@ class _AccountScreenState extends State<AccountScreen> {
                     child: CircleAvatar(
                       radius: 30.r,
                       backgroundImage: storeImageUrl.isNotEmpty
-                          ? NetworkImage(storeImageUrl) // Load store image from URL
+                          ? NetworkImage(
+                              storeImageUrl) // Load store image from URL
                           : null, // If no image URL available, don't display any image
                       child: storeImageUrl.isEmpty && _image == null
-                          ? const Icon(Icons.image, size: 40, color: Colors.white) // Show image icon only if no image URL and no selected image
+                          ? const Icon(Icons.image,
+                              size: 40,
+                              color: Colors
+                                  .white) // Show image icon only if no image URL and no selected image
                           : null, // Otherwise, don't display anything inside CircleAvatar
                     ),
                   ),
@@ -204,24 +225,24 @@ class _AccountScreenState extends State<AccountScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                    Text(
-                      '$storeName',
-                      style: fontStyle(14.sp, Colors.black, FontWeight.w600),
-                    ),
-                    Text(
-                      '$ownerName',
-                      style: fontStyle(12.sp, Colors.black),
-                    ),
-                    Text(
-                      'Email: $emailAddress',
-                      style: fontStyle(12.sp, Colors.green),
-                    ),
-                    Text(
-                      'Shipping Address: $storeAddress',
-                      style: fontStyle(12.sp, Colors.grey),
-                    ),
-                  ],),
-
+                      Text(
+                        '$storeName',
+                        style: fontStyle(14.sp, Colors.black, FontWeight.w600),
+                      ),
+                      Text(
+                        '$ownerName',
+                        style: fontStyle(12.sp, Colors.black),
+                      ),
+                      Text(
+                        'Email: $emailAddress',
+                        style: fontStyle(12.sp, Colors.green),
+                      ),
+                      Text(
+                        'Shipping Address: $storeAddress',
+                        style: fontStyle(12.sp, Colors.grey),
+                      ),
+                    ],
+                  ),
                   SizedBox(height: 20.h),
                   for (var index = 0; index < myAccount.length; index++)
                     Padding(
@@ -244,7 +265,9 @@ class _AccountScreenState extends State<AccountScreen> {
                           child: Row(
                             children: [
                               SvgPicture.asset(
-                                '${myAccount[index].img1}',height: 15,width: 15,
+                                '${myAccount[index].img1}',
+                                height: 15,
+                                width: 15,
                               ),
                               SizedBox(width: 15.w),
                               Text("${myAccount[index].title}",
@@ -263,12 +286,16 @@ class _AccountScreenState extends State<AccountScreen> {
                       },
                       child: Row(
                         children: [
-                          SvgPicture.asset(ImageAssets.logoutIconSVG,height: 15,width: 15,),
+                          SvgPicture.asset(
+                            ImageAssets.logoutIconSVG,
+                            height: 15,
+                            width: 15,
+                          ),
                           SizedBox(width: 15.w),
                           Text(
                             "Log Out",
-                            style: fontStyle(
-                                15.sp, const Color(0xffE40404), FontWeight.w400),
+                            style: fontStyle(15.sp, const Color(0xffE40404),
+                                FontWeight.w400),
                           ),
                         ],
                       ),

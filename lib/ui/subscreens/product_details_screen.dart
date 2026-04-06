@@ -80,7 +80,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -125,7 +125,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     if (accessToken != null) {
       try {
         final response = await http.get(
-          Uri.parse('https://app.omnicare.com.bd/api/addToWishlist/$productId'),
+          Uri.parse(
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -181,7 +182,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
       final int wishlistId = _wishlistItems[wishlistIndex]['id'];
       final Uri url = Uri.parse(
-          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -257,7 +258,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
 
     try {
       final response = await http.post(
@@ -349,8 +350,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     double after_discount_price = extractAfterDiscountPrice();
     var favoriteProvider = Provider.of<FavoriteProvider>(context);
     bool isFavorite =
-        favoriteProvider.isFavorite(widget.productDetails['id']) ||
-            isFavourite;
+        favoriteProvider.isFavorite(widget.productDetails['id']) || isFavourite;
     var cartProviders = Provider.of<CartProvider>(context, listen: false);
     return SafeArea(
       child: Scaffold(
@@ -389,8 +389,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               // Return a fallback image when an error occurs
-                              return Image.asset(ImageAssets.productJPG,
-                                  fit: BoxFit.cover,);
+                              return Image.asset(
+                                ImageAssets.productJPG,
+                                fit: BoxFit.cover,
+                              );
                             },
                           ),
                         ),
@@ -460,7 +462,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             ['brand_name'] !=
                                         null)
                                 ? widget.productDetails['brand']['brand_name']
-                                : (widget.productDetails['company_name'] ?? 'Unknown company'),
+                                : (widget.productDetails['company_name'] ??
+                                    'Unknown company'),
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xff555555),
@@ -478,19 +481,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const Text(
                         'Product Price',
                         style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,),
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Text(
                         '৳ $sell_price'.replaceAll(',', ''),
                         style: const TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w400,
-                            decoration: TextDecoration.lineThrough,
-                            decorationColor: Colors.red,
-                            decorationThickness: 3,),
+                          fontSize: 15,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                          decoration: TextDecoration.lineThrough,
+                          decorationColor: Colors.red,
+                          decorationThickness: 3,
+                        ),
                       ),
                       Text(
                         '৳ $after_discount_price'.replaceAll(',', ''),

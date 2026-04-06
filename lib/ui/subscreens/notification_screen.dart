@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class NotificationScreen extends StatefulWidget {
   final Function(bool) onNotificationUpdate;
 
-   const NotificationScreen({Key? key, required this.onNotificationUpdate});
+  const NotificationScreen({Key? key, required this.onNotificationUpdate});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -23,8 +23,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.initState();
     fetchNotifications();
   }
+
   Future<void> fetchNotifications() async {
-    final url = Uri.parse('https://app.omnicare.com.bd/api/settings');
+    final url =
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/settings');
     setState(() {
       isLoading = true;
     });
@@ -62,6 +64,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,29 +93,30 @@ class _NotificationScreenState extends State<NotificationScreen> {
           child: isLoading
               ? const ShimmerWidget()
               : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: notifications
-                .map((notification) => Container(
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.blue[50],
-              ),
-              child: Text(
-                notification.text, // Accessing the text property of NotificationModel
-                style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: notifications
+                      .map((notification) => Container(
+                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(10),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.blue[50],
+                            ),
+                            child: Text(
+                              notification
+                                  .text, // Accessing the text property of NotificationModel
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ))
+                      .toList(),
                 ),
-              ),
-            ))
-                .toList(),
-          ),
-          ),
         ),
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print, unused_local_variable, unused_element, prefer_const_constructors
 
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +11,7 @@ import 'package:omnicare_app/const/bottom_navbar.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -31,22 +34,39 @@ class _LoginScreenState extends State<LoginScreen> {
         .hasMatch(email);
   }
 
+  /// 🔹 Get Device ID
+  Future<String> getDeviceId() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.id ?? "";
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor ?? "";
+    }
+
+    return "";
+  }
+
   Future<void> _login() async {
     print('Attempting login...');
-    const String apiUrl = 'https://app.omnicare.com.bd/api/login';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/login';
     final String email = emailController.text;
     final String password = passwordController.text;
+
+    String deviceId = await getDeviceId();
+
+    log("-----deviceid--$deviceId");
 
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
-        body: {
-          'email': email,
-          'password': password,
-        },
+        body: {'email': email, 'password': password, 'device_id': deviceId},
       );
 
-      print('Response received: ${response.statusCode}');
+     
+      log('Response received: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -63,17 +83,25 @@ class _LoginScreenState extends State<LoginScreen> {
         final String userEmail = user['email'] as String? ?? '';
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        log("accessToken--------${accessToken}");
+        log("refreshToken--------${refreshToken}");
+        
+        prefs.setInt('userId', userId);
         prefs.setString('accessToken', accessToken);
         prefs.setString('refreshToken', refreshToken);
 
         Get.offAll(() => const BottomNavBarScreen());
       } else if (response.statusCode == 401) {
+        log("----response.statusCode---${response.statusCode}");
+        log("----response.statusCode---${response}");
         _showSnackBar('Incorrect email or password. Please try again.');
       } else {
         const errorMessage = 'An error occurred. Please try again later.';
         _showSnackBar(errorMessage);
       }
     } catch (error) {
+      log("error--$error");
       const errorMessage = 'An error occurred during login. Please try again.';
       _showSnackBar(errorMessage);
     }
@@ -97,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
 
     try {
       final response = await http.post(

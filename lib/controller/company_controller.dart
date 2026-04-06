@@ -25,8 +25,8 @@ class CompanyController extends GetxController {
         print('Data loaded from Hive');
         companyList.assignAll(companiesFromHive);
       } else {
-        final response = await http
-            .get(Uri.parse('https://app.omnicare.com.bd/api/all_brands'));
+        final response = await http.get(Uri.parse(
+            'https://stage.medone.primeharvestbd.com/api/all_brands'));
         if (response.statusCode == 200) {
           print('Data fetched from API');
           // Rest of the code...

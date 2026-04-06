@@ -50,7 +50,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         isLoading = true;
       });
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/orderDetails/$orderId'),
+        Uri.parse(
+            'https://stage.medone.primeharvestbd.com/api/orderDetails/$orderId'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -99,7 +100,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    final String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),

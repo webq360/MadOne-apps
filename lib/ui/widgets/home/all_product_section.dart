@@ -61,7 +61,7 @@ class _AllProductSectionState extends State<AllProductSection> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -90,32 +90,6 @@ class _AllProductSectionState extends State<AllProductSection> {
     }
   }
 
-  // void AllProducts() async {
-  //   inProgress = true;
-  //   setState(() {});
-  //   try {
-  //     final response =
-  //         await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
-  //     if (response.statusCode == 200) {
-  //       final json = jsonDecode(response.body);
-  //       if (mounted) {
-  //         setState(() {
-  //           controller.allproductsList = json['offered_products'];
-  //           isFavouriteList = List.filled(controller.allproductsList.length, false);
-  //         });
-  //       }
-  //       print(controller.allproductsList);
-  //     } else {
-  //       print(
-  //           'Failed to load company names. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (error) {
-  //     print('Error: $error');
-  //   }
-  //   inProgress = false;
-  //   setState(() {});
-  //   Provider.of<CartProvider>(context, listen: false).notifyListeners();
-  // }
 
   Future<void> addToWishlist(int productId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -123,7 +97,8 @@ class _AllProductSectionState extends State<AllProductSection> {
     if (accessToken != null) {
       try {
         final response = await http.get(
-          Uri.parse('https://app.omnicare.com.bd/api/addToWishlist/$productId'),
+          Uri.parse(
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -167,7 +142,7 @@ class _AllProductSectionState extends State<AllProductSection> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -243,7 +218,7 @@ class _AllProductSectionState extends State<AllProductSection> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),

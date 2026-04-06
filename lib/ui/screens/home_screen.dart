@@ -5,13 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:omnicare_app/const/custom_appbar.dart';
+import 'package:omnicare_app/const/custom_widgets.dart';
 import 'package:omnicare_app/controller/company_controller.dart';
 import 'package:omnicare_app/controller/home_controller.dart';
 import 'package:omnicare_app/hive/home_hive/hive_model.dart';
 import 'package:omnicare_app/hive/home_hive/home_hive.dart';
+import 'package:omnicare_app/ui/widgets/category_list.dart';
 import 'package:omnicare_app/ui/widgets/home/offer_product_section.dart';
 import 'package:omnicare_app/ui/widgets/home/company_section.dart';
 import 'package:omnicare_app/ui/widgets/home/all_product_section.dart';
+import 'package:omnicare_app/ui/widgets/home/see_all_product_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -154,6 +157,38 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(vertical: 5.h),
                           child: CompanySection(),
                         ),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Featured categories",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      Get.to(() => const SeeAllProductScreen());
+                                    });
+                                  },
+                                  child: Text(
+                                    "See all",
+                                    style: fontStyle(
+                                        12.sp, Colors.black, FontWeight.w400),
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 20.h),
+                            CategoryList(),
+                          ],
+                        ),
+                        SizedBox(height: 20.h),
                         const AllProductSection(),
                         //const OfferedProductSection(),
                         SizedBox(height: 20.h),

@@ -1,8 +1,13 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:omnicare_app/hive/home_hive/hive_model.dart'; // Import Hive model classes
-import 'package:omnicare_app/hive/home_hive/home_hive.dart'; // Import HiveService
+import 'package:omnicare_app/hive/home_hive/home_hive.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import HiveService
 
 class HomeController extends GetxController {
   var isLoading = true.obs;
@@ -18,13 +23,73 @@ class HomeController extends GetxController {
     super.onInit();
     loadDataFromHive();
     fetchData();
+    initial();
+
+  }
+ Future<void> initial() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('userId');
+
+      if (userId == null) {
+        log('userId not found in SharedPreferences');
+        return;
+      }
+
+      String? fcmToken;
+
+      if (!Platform.isIOS) {
+        fcmToken = await FirebaseMessaging.instance.getToken();
+        log("Android FCM Token: $fcmToken");
+      } else {
+        fcmToken = await FirebaseMessaging.instance.getToken();
+        log("iOS FCM Token: $fcmToken");
+
+        // Optional:
+        // final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        // log("iOS APNS Token: $apnsToken");
+      }
+
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        await sendFcmTokenToServer(
+          token: fcmToken,
+          userId: userId,
+        );
+      }
+    } catch (e) {
+      log("FCM Error: $e");
+    }
+  }
+
+  Future<void> sendFcmTokenToServer({
+    required String token,
+    required int userId,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/fcm-token'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'token': token,
+          'user_id': userId,
+        }),
+      );
+
+      log('FCM Token API Status: ${response.statusCode}');
+      log('FCM Token API Response: ${response.body}');
+    } catch (e) {
+      log('sendFcmTokenToServer Error: $e');
+    }
   }
 
   Future<void> fetchData() async {
     try {
       isLoading.value = true;
-      final response =
-          await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
+      final response = await http
+          .get(Uri.parse('https://stage.medone.primeharvestbd.com/api'));
       final json = jsonDecode(response.body);
 
       final List<dynamic> slidersJson = json['sliders'];

@@ -65,7 +65,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api//wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -96,7 +96,8 @@ class _OfferProductSectionState extends State<OfferProductSection> {
     if (accessToken != null) {
       try {
         final response = await http.get(
-          Uri.parse('https://app.omnicare.com.bd/api/addToWishlist/$productId'),
+          Uri.parse(
+              'https://stage.medone.primeharvestbd.com/api//addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -140,7 +141,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api//removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -215,7 +216,8 @@ class _OfferProductSectionState extends State<OfferProductSection> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    final String apiUrl =
+        'https://stage.medone.primeharvestbd.com/api//refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),

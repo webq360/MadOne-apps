@@ -14,11 +14,13 @@ import 'package:omnicare_app/ui/screens/account_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
+
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   File? _image;
@@ -46,6 +48,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     }
   }
+
 // Replace the _captureImage method with the following
   Future<void> _captureImage() async {
     final imagePicker = ImagePicker();
@@ -56,8 +59,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     }
   }
-  
-  
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     });
   }
+
   Future<void> fetchUserProfile() async {
     if (!mounted) return;
     try {
@@ -81,7 +84,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         pharmacyNameController.text = pharmacyName;
         ownerNameController.text = fetchedData?['pharmacy']['owner_name'] ?? '';
-        drugLicenseController.text = fetchedData?['pharmacy']['drag_license'] ?? '';
+        drugLicenseController.text =
+            fetchedData?['pharmacy']['drag_license'] ?? '';
         mobileNumberController.text = fetchedData?['pharmacy']['mobile'] ?? '';
         if (fetchedData?['pharmacy']['zone'] != null) {
           selectedZone = Zone.fromJson(fetchedData?['pharmacy']['zone']);
@@ -123,8 +127,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-
-
   // Fetch additional user profile information (pharmacy name, email address, etc.)
   Future<void> fetchAdditionalUserProfile() async {
     try {
@@ -134,10 +136,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/profile'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/profile'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
-      print('Fetch Additional User Profile status code: ${response.statusCode}');
+      print(
+          'Fetch Additional User Profile status code: ${response.statusCode}');
       if (response.statusCode == 200) {
         fetchedData = json.decode(response.body);
         print('Fetched Additional User Profile: $fetchedData');
@@ -155,6 +158,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print('Error during additional user profile fetch: $error');
     }
   }
+
   Future<void> fetchStoreName() async {
     try {
       final String? authToken = await _getAccessToken();
@@ -164,7 +168,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.omnicare.com.bd/api/profile'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/profile'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print('Fetch Store Name status code: ${response.statusCode}');
@@ -179,13 +183,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await _handleTokenRefresh(fetchStoreName);
       } else {
         // Handle API error
-        print('Failed to fetch store name. Status code: ${response.statusCode}');
+        print(
+            'Failed to fetch store name. Status code: ${response.statusCode}');
       }
     } catch (error) {
       // Handle network errors or unexpected situations
       print('Error during store name fetch: $error');
     }
   }
+
   // Function to handle token refresh
   Future<void> _handleTokenRefresh(Function onRefreshComplete) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -208,14 +214,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     }
   }
+
   // Function to get the current access token
   Future<String?> _getAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
+
   // Function to refresh the access token
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -236,8 +244,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return null;
     }
   }
+
   Future<List<Zone>> fetchZones() async {
-    final response = await http.get(Uri.parse('https://app.omnicare.com.bd/api/zones'));
+    final response = await http
+        .get(Uri.parse('https://stage.medone.primeharvestbd.com/api/zones'));
     if (response.statusCode == 200) {
       Iterable data = json.decode(response.body)['zones'];
       // Use a set to ensure unique zones based on their ID
@@ -255,6 +265,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       throw Exception('Failed to load zones');
     }
   }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -279,7 +290,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         // API endpoint for updating pharmacy information
         final String apiUrl =
-            'https://app.omnicare.com.bd/api/pharmacy/update/$pharmacyId';
+            'https://stage.medone.primeharvestbd.com/api/pharmacy/update/$pharmacyId';
         // Construct the request headers with the authorization token
         Map<String, String> headers = {
           'Authorization': 'Bearer $authToken',
@@ -322,7 +333,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         var responseData = await response.stream.bytesToString();
 
         Navigator.pop(context);
-        print('Update Pharmacy Information status code: ${response.statusCode}');
+        print(
+            'Update Pharmacy Information status code: ${response.statusCode}');
         if (response.statusCode == 200) {
           print('Pharmacy information updated successfully.');
           // Call fetchUserProfile to update the displayed information
@@ -338,13 +350,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         } else if (response.statusCode == 401) {
           await _handleTokenRefresh(() => _submitForm());
         } else {
-          print('Failed to update pharmacy information. Status code: ${response.statusCode}');
+          print(
+              'Failed to update pharmacy information. Status code: ${response.statusCode}');
         }
       } catch (error) {
         print('Error during pharmacy information update: $error');
       }
     }
   }
+
   Future<void> _checkNetworkAndLoggedIn() async {
     bool hasNetwork = await checkNetwork();
     bool userLoggedIn = await isLoggedIn();
@@ -360,6 +374,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Get.to(() => const NetworkCheckScreen());
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -388,7 +403,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
-              child:  Form(
+              child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -406,16 +421,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: CircleAvatar(
                             radius: 30.r,
                             child: _image == null
-                                ? (fetchedData?['pharmacy']['store_image'] != null
-                                ? Image.network(
-                              fetchedData?['pharmacy']['store_image'],
-                              fit: BoxFit.cover,
-                            )
-                                : const Icon(Icons.image, size: 40, color: Colors.white))
+                                ? (fetchedData?['pharmacy']['store_image'] !=
+                                        null
+                                    ? Image.network(
+                                        fetchedData?['pharmacy']['store_image'],
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Icon(Icons.image,
+                                        size: 40, color: Colors.white))
                                 : CircleAvatar(
-                              backgroundImage: FileImage(_image!),
-                              radius: 30.r,
-                            ),
+                                    backgroundImage: FileImage(_image!),
+                                    radius: 30.r,
+                                  ),
                           ),
                         ),
                         Positioned(
@@ -430,8 +447,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       ListTile(
-                                        leading: const Icon(Icons.photo_library),
-                                        title: const Text('Choose from Gallery'),
+                                        leading:
+                                            const Icon(Icons.photo_library),
+                                        title:
+                                            const Text('Choose from Gallery'),
                                         onTap: () {
                                           Navigator.pop(context);
                                           _pickImageFromGallery();
@@ -458,13 +477,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10.h,),
+                    SizedBox(
+                      height: 10.h,
+                    ),
                     Text('$storeName'),
                     Text(
                       '$emailAddress',
                       style: const TextStyle(color: Colors.green),
                     ),
-                    SizedBox(height: 15.h,),
+                    SizedBox(
+                      height: 15.h,
+                    ),
                     TextFormField(
                       controller: pharmacyNameController..text = pharmacyName,
                       decoration: const InputDecoration(
@@ -523,7 +546,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onChanged: (String? value) {
                         setState(() {
                           selectedZoneName = value;
-                          selectedZone = zones.firstWhere((zone) => zone.zoneName == value);
+                          selectedZone = zones
+                              .firstWhere((zone) => zone.zoneName == value);
                         });
                       },
                       decoration: const InputDecoration(
@@ -559,7 +583,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           }
                         },
                         color: ColorPalette.primaryColor,
-                        child: const Text('Submit',
+                        child: const Text(
+                          'Submit',
                           style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
@@ -574,6 +599,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
+
 class Zone {
   final int id;
   final String zoneName;
