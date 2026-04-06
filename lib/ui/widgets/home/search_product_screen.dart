@@ -65,7 +65,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api//wishlist'),
+        Uri.parse('https://app.medonetrade.com/api//wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -108,7 +108,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         isLoading = true;
       });
       final response = await http.get(Uri.parse(
-          'https://stage.medone.primeharvestbd.com/api//all_products_list'));
+          'https://app.medonetrade.com/api//all_products_list'));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (json['data'] is List) {
@@ -140,7 +140,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              'https://stage.medone.primeharvestbd.com/api//addToWishlist/$productId'),
+              'https://app.medonetrade.com/api//addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -184,7 +184,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://stage.medone.primeharvestbd.com/api//removeFromWishlist/$wishlistId');
+          'https://app.medonetrade.com/api//removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -263,7 +263,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
 
   Future<String?> _refreshToken(String refreshToken) async {
     const String apiUrl =
-        'https://stage.medone.primeharvestbd.com/api//refresh';
+        'https://app.medonetrade.com/api//refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -398,7 +398,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       });
       final response = await http.post(
         Uri.parse(
-            'https://stage.medone.primeharvestbd.com/api//search_product?query=$query'),
+            'https://app.medonetrade.com/api//search_product?query=$query'),
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);

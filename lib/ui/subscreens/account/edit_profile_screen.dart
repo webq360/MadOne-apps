@@ -136,7 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api/profile'),
+        Uri.parse('https://app.medonetrade.com/api/profile'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print(
@@ -168,7 +168,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api/profile'),
+        Uri.parse('https://app.medonetrade.com/api/profile'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print('Fetch Store Name status code: ${response.statusCode}');
@@ -223,7 +223,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // Function to refresh the access token
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
+    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -247,7 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<List<Zone>> fetchZones() async {
     final response = await http
-        .get(Uri.parse('https://stage.medone.primeharvestbd.com/api/zones'));
+        .get(Uri.parse('https://app.medonetrade.com/api/zones'));
     if (response.statusCode == 200) {
       Iterable data = json.decode(response.body)['zones'];
       // Use a set to ensure unique zones based on their ID
@@ -290,7 +290,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         // API endpoint for updating pharmacy information
         final String apiUrl =
-            'https://stage.medone.primeharvestbd.com/api/pharmacy/update/$pharmacyId';
+            'https://app.medonetrade.com/api/pharmacy/update/$pharmacyId';
         // Construct the request headers with the authorization token
         Map<String, String> headers = {
           'Authorization': 'Bearer $authToken',

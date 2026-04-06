@@ -67,7 +67,7 @@ class HomeController extends GetxController {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api/fcm-token'),
+        Uri.parse('https://app.medonetrade.com/api/fcm-token'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ class HomeController extends GetxController {
     try {
       isLoading.value = true;
       final response = await http
-          .get(Uri.parse('https://stage.medone.primeharvestbd.com/api'));
+          .get(Uri.parse('https://app.medonetrade.com/api'));
       final json = jsonDecode(response.body);
 
       final List<dynamic> slidersJson = json['sliders'];

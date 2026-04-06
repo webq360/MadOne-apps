@@ -21,7 +21,7 @@ class HomeDataProvider extends ChangeNotifier {
 
     try {
       final response = await http
-          .get(Uri.parse('https://stage.medone.primeharvestbd.com/api'));
+          .get(Uri.parse('https://app.medonetrade.com/api'));
       final json = jsonDecode(response.body);
       sliderList = json['sliders'];
       bannerList = json['site_settigs'];

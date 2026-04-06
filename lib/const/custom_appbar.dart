@@ -39,7 +39,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Future<void> _fetchPhoneNumber() async {
-    const apiUrl = "https://stage.medone.primeharvestbd.com/api/settings";
+    const apiUrl = "https://app.medonetrade.com/api/settings";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -87,7 +87,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Future<void> _checkForNewNotifications() async {
     try {
       final response = await http.get(
-          Uri.parse("https://stage.medone.primeharvestbd.com/api/settings"));
+          Uri.parse("https://app.medonetrade.com/api/settings"));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> siteSettings = data['site_settigs'];

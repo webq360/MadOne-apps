@@ -35,7 +35,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
         isLoading = true;
       });
       final response = await http.get(
-          Uri.parse('https://stage.medone.primeharvestbd.com/api/all_brands'));
+          Uri.parse('https://app.medonetrade.com/api/all_brands'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);

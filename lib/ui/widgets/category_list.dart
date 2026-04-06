@@ -11,7 +11,7 @@ class CategoryList extends StatelessWidget {
   final ProductController controller = Get.find<ProductController>();
 
   final String baseImageUrl =
-      "https://stage.medone.primeharvestbd.com/uploads/category/";
+      "https://app.medonetrade.com/uploads/category/";
 
   @override
   Widget build(BuildContext context) {

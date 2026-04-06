@@ -26,7 +26,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> fetchNotifications() async {
     final url =
-        Uri.parse('https://stage.medone.primeharvestbd.com/api/settings');
+        Uri.parse('https://app.medonetrade.com/api/settings');
     setState(() {
       isLoading = true;
     });

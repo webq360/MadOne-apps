@@ -70,7 +70,7 @@ class _SearchedBrandWiseProductScreenState
         return;
       }
       final response = await http.get(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api//wishlist'),
+        Uri.parse('https://app.medonetrade.com/api//wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -113,7 +113,7 @@ class _SearchedBrandWiseProductScreenState
         isLoading = true;
       });
       final response = await http.get(Uri.parse(
-          'https://stage.medone.primeharvestbd.com/api//brand_wise_product/${widget.brandId}'));
+          'https://app.medonetrade.com/api//brand_wise_product/${widget.brandId}'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<dynamic> products = responseData['products'];
@@ -138,7 +138,7 @@ class _SearchedBrandWiseProductScreenState
     //     isLoading = true;
     //   });
     //   final response =
-    //       await http.get(Uri.parse('https://stage.medone.primeharvestbd.com/api/'));
+    //       await http.get(Uri.parse('https://app.medonetrade.com/api/'));
     //   if (response.statusCode == 200) {
     //     final json = jsonDecode(response.body);
     //     if (json['all_products'] is List) {
@@ -170,7 +170,7 @@ class _SearchedBrandWiseProductScreenState
       try {
         final response = await http.get(
           Uri.parse(
-              'https://stage.medone.primeharvestbd.com/api//addToWishlist/$productId'),
+              'https://app.medonetrade.com/api//addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -214,7 +214,7 @@ class _SearchedBrandWiseProductScreenState
         return;
       }
       final Uri url = Uri.parse(
-          'https://stage.medone.primeharvestbd.com/api//removeFromWishlist/$wishlistId');
+          'https://app.medonetrade.com/api//removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -293,7 +293,7 @@ class _SearchedBrandWiseProductScreenState
 
   Future<String?> _refreshToken(String refreshToken) async {
     const String apiUrl =
-        'https://stage.medone.primeharvestbd.com/api//refresh';
+        'https://app.medonetrade.com/api//refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -427,10 +427,10 @@ class _SearchedBrandWiseProductScreenState
         isLoading = true;
       });
 
-      ///https://stage.medone.primeharvestbd.com/api//brand_wise_product/9 //check post api or get api
+      ///https://app.medonetrade.com/api//brand_wise_product/9 //check post api or get api
       final response = await http.post(
         Uri.parse(
-            'https://stage.medone.primeharvestbd.com/api//search_specific_brand_product/${widget.brandId}?query=$query'),
+            'https://app.medonetrade.com/api//search_specific_brand_product/${widget.brandId}?query=$query'),
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);

@@ -33,7 +33,7 @@ Future<void> getCategoryWiseProducts({
   try {
     final response = await http.get(
       Uri.parse(
-        'https://stage.medone.primeharvestbd.com/api/category_wise_product/$categoryId',
+        'https://app.medonetrade.com/api/category_wise_product/$categoryId',
       ),
     );
 
@@ -66,7 +66,7 @@ Future<void> getCategoryWiseProducts({
       inProgress.value = true;
       try {
         final response = await http.get(
-          Uri.parse('https://stage.medone.primeharvestbd.com/api'),
+          Uri.parse('https://app.medonetrade.com/api'),
         );
 
         if (response.statusCode == 200) {
@@ -93,7 +93,7 @@ Future<void> getCategoryWiseProducts({
       inProgress.value = true;
       try {
         final response = await http.get(
-          Uri.parse('https://stage.medone.primeharvestbd.com/api'),
+          Uri.parse('https://app.medonetrade.com/api'),
         );
 
         if (response.statusCode == 200) {
@@ -117,7 +117,7 @@ Future<void> getCategoryWiseProducts({
       inProgress.value = true;
       try {
         final response = await http.get(
-          Uri.parse('https://stage.medone.primeharvestbd.com/api'),
+          Uri.parse('https://app.medonetrade.com/api'),
         );
 
         if (response.statusCode == 200) {
@@ -148,7 +148,7 @@ Future<void> getFeaturedCategories() async {
     try {
       final response = await http.get(
         Uri.parse(
-          'https://stage.medone.primeharvestbd.com/api/featured_categories',
+          'https://app.medonetrade.com/api/featured_categories',
         ),
       );
 

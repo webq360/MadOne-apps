@@ -354,7 +354,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   }
 
   Future fetchDeliveryCharge() async {
-    const apiUrl = 'https://stage.medone.primeharvestbd.com/api/settings';
+    const apiUrl = 'https://app.medonetrade.com/api/settings';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -390,7 +390,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     required String insideDhaka,
     required String outsideDhaka,
   }) async {
-    const apiUrl = 'https://stage.medone.primeharvestbd.com/api/checkout';
+    const apiUrl = 'https://app.medonetrade.com/api/checkout';
 
     // Prepare payload for the API reques
     final payload = {
@@ -491,7 +491,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
   // Function to refresh the access token
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
+    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
 
     try {
       final response = await http.post(

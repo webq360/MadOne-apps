@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     print('Attempting login...');
-    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/login';
+    const String apiUrl = 'https://app.medonetrade.com/api/login';
     final String email = emailController.text;
     final String password = passwordController.text;
 
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
+    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
 
     try {
       final response = await http.post(
