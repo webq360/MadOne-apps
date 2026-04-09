@@ -129,7 +129,7 @@ class _SeeTrendingProductScreenState extends State<SeeTrendingProductScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  mainAxisExtent: 260.h,
+                  mainAxisExtent: 270.h,
                 ),
                 itemCount: productsList.length,
                 itemBuilder: (context, index) {
@@ -241,6 +241,7 @@ class _SeeTrendingProductScreenState extends State<SeeTrendingProductScreen> {
                                         ),
                                       )
                                     : Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
                                           InkWell(
                                             onTap: () {
@@ -250,19 +251,19 @@ class _SeeTrendingProductScreenState extends State<SeeTrendingProductScreen> {
                                               });
                                             },
                                             child: Container(
-                                              padding: const EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(25),
                                                 color: ColorPalette.primaryColor,
                                               ),
-                                              child: const Icon(Icons.remove, color: Colors.white),
+                                              child: const Icon(Icons.remove, color: Colors.white, size: 16),
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.all(10.0),
+                                            padding: const EdgeInsets.symmetric(horizontal: 6.0),
                                             child: Text(
                                               '${cartProvider.getProductQuantityById(productId)}',
-                                              style: fontStyle(18, const Color.fromARGB(255, 184, 11, 11), FontWeight.w400),
+                                              style: fontStyle(14, const Color.fromARGB(255, 184, 11, 11), FontWeight.w400),
                                             ),
                                           ),
                                           InkWell(
@@ -273,12 +274,12 @@ class _SeeTrendingProductScreenState extends State<SeeTrendingProductScreen> {
                                               });
                                             },
                                             child: Container(
-                                              padding: const EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(25),
                                                 color: ColorPalette.primaryColor,
                                               ),
-                                              child: const Icon(Icons.add, color: Colors.white),
+                                              child: const Icon(Icons.add, color: Colors.white, size: 16),
                                             ),
                                           ),
                                         ],

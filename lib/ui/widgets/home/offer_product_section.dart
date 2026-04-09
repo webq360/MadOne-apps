@@ -366,7 +366,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       childAspectRatio: 0.60,
-                      mainAxisExtent: 260.h,
+                      mainAxisExtent: 270.h,
                     ),
                     itemCount: controller.offeredproductsList.length,
                     itemBuilder: (context, index) {
@@ -382,6 +382,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                               );
                             },
                             child: Container(
+                              clipBehavior: Clip.hardEdge,
                               padding: EdgeInsets.all(5.w),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.r),
@@ -561,129 +562,51 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                 ),
                                               )
                                             : Row(
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   ///decrement cart quantity
                                                   InkWell(
                                                     onTap: () {
                                                       if (!_isUpdatingQuantity) {
                                                         setState(() {
-                                                          _isUpdatingQuantity =
-                                                              true; // Set flag to true
-                                                          var quantity =
-                                                              cartProviders
-                                                                  .getProductQuantityById(
-                                                            controller
-                                                                    .offeredproductsList[
-                                                                index]['id'],
-                                                          );
+                                                          _isUpdatingQuantity = true;
+                                                          var quantity = cartProviders.getProductQuantityById(controller.offeredproductsList[index]['id']);
                                                           quantity--;
-
-                                                          cartProviders
-                                                              .updateQuantityById(
-                                                            controller
-                                                                    .offeredproductsList[
-                                                                index]['id'],
-                                                            quantity,
-                                                          );
+                                                          cartProviders.updateQuantityById(controller.offeredproductsList[index]['id'], quantity);
                                                         });
-                                                        Future.delayed(
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    700), () {
-                                                          setState(() {
-                                                            _isUpdatingQuantity =
-                                                                false;
-                                                          });
-                                                        });
+                                                        Future.delayed(const Duration(milliseconds: 700), () { setState(() { _isUpdatingQuantity = false; }); });
                                                       }
                                                     },
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              5),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(25),
-                                                        color: ColorPalette
-                                                            .primaryColor,
-                                                      ),
-                                                      child: const Icon(
-                                                        Icons.remove,
-                                                        color: Colors.white,
-                                                      ),
+                                                      padding: const EdgeInsets.all(4),
+                                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: ColorPalette.primaryColor),
+                                                      child: const Icon(Icons.remove, color: Colors.white, size: 16),
                                                     ),
                                                   ),
-
-                                                  ///cart quantity
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
                                                     child: Text(
-                                                      '${int.parse(cartProviders.getProductQuantityById(controller.offeredproductsList[index]['id']).toString())}',
-                                                      style: fontStyle(
-                                                        18,
-                                                        const Color.fromARGB(
-                                                          255,
-                                                          184,
-                                                          11,
-                                                          11,
-                                                        ),
-                                                        FontWeight.w400,
-                                                      ),
+                                                      '${cartProviders.getProductQuantityById(controller.offeredproductsList[index]['id'])}',
+                                                      style: fontStyle(14, const Color.fromARGB(255, 184, 11, 11), FontWeight.w400),
                                                     ),
                                                   ),
-
-                                                  ///inecrement cart quantity
+                                                  ///increment cart quantity
                                                   InkWell(
                                                     onTap: () {
                                                       if (!_isUpdatingQuantity) {
                                                         setState(() {
-                                                          _isUpdatingQuantity =
-                                                              true;
-                                                          var quantity =
-                                                              cartProviders
-                                                                  .getProductQuantityById(
-                                                            controller
-                                                                    .offeredproductsList[
-                                                                index]['id'],
-                                                          );
+                                                          _isUpdatingQuantity = true;
+                                                          var quantity = cartProviders.getProductQuantityById(controller.offeredproductsList[index]['id']);
                                                           quantity++;
-
-                                                          cartProviders
-                                                              .updateQuantityById(
-                                                            controller
-                                                                    .offeredproductsList[
-                                                                index]['id'],
-                                                            quantity,
-                                                          );
+                                                          cartProviders.updateQuantityById(controller.offeredproductsList[index]['id'], quantity);
                                                         });
-                                                        Future.delayed(
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    700), () {
-                                                          setState(() {
-                                                            _isUpdatingQuantity =
-                                                                false;
-                                                          });
-                                                        });
+                                                        Future.delayed(const Duration(milliseconds: 700), () { setState(() { _isUpdatingQuantity = false; }); });
                                                       }
                                                     },
                                                     child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(5.r),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(25.r),
-                                                        color: ColorPalette
-                                                            .primaryColor,
-                                                      ),
-                                                      child: const Icon(
-                                                        Icons.add,
-                                                        color: Colors.white,
-                                                      ),
+                                                      padding: EdgeInsets.all(4.r),
+                                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.r), color: ColorPalette.primaryColor),
+                                                      child: const Icon(Icons.add, color: Colors.white, size: 16),
                                                     ),
                                                   ),
                                                 ],

@@ -129,7 +129,16 @@ Future<void> getCategoryWiseProducts({
         if (response.statusCode == 200) {
           final json = jsonDecode(response.body);
           final list = json['data'] ?? [];
-          allproductsList.assignAll(list);
+          // Filter out hidden products (status == 0) if backend adds status field
+          // Also filter out products explicitly marked as hidden
+          final filtered = (list as List).where((p) {
+            // If backend adds status field: exclude status=0
+            if (p['status'] != null && p['status'] == 0) return false;
+            // If backend adds is_hidden field: exclude hidden
+            if (p['is_hidden'] == 1 || p['is_hidden'] == true) return false;
+            return true;
+          }).toList();
+          allproductsList.assignAll(filtered);
           print('All Products Loaded: ${allproductsList.length}');
 
           if (isFavouriteList.length != allproductsList.length) {

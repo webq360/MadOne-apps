@@ -368,7 +368,7 @@ class _AllProductSectionState extends State<AllProductSection> {
                   ),
                 )
               : SizedBox(
-                  height: 260.h,
+                  height: 270.h,
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 5.h),
                     child: ListView.builder(
@@ -390,6 +390,7 @@ class _AllProductSectionState extends State<AllProductSection> {
                                 );
                               },
                               child: Container(
+                                clipBehavior: Clip.hardEdge,
                                 padding: EdgeInsets.all(8.w),
                                 margin: EdgeInsets.only(right: 5.w),
                                 width: 155.w,
@@ -454,7 +455,6 @@ class _AllProductSectionState extends State<AllProductSection> {
                                               FontWeight.w500,
                                             ),
                                           ),
-
                                           Text(
                                             '৳${controller.allproductsList[index]['after_discount_price']}',
                                             style: fontStyle(12.sp,
@@ -468,8 +468,7 @@ class _AllProductSectionState extends State<AllProductSection> {
                                                   fontSize: 12,
                                                   color: Colors.grey,
                                                   fontWeight: FontWeight.w400,
-                                                  decoration: TextDecoration
-                                                      .lineThrough,
+                                                  decoration: TextDecoration.lineThrough,
                                                   decorationColor: Colors.red,
                                                   decorationThickness: 3,
                                                 ),
@@ -478,215 +477,88 @@ class _AllProductSectionState extends State<AllProductSection> {
                                               Row(
                                                 children: [
                                                   Text(
-                                                    '৳${double.parse(controller.allproductsList[index]['discount']).toStringAsFixed(2)}',
-                                                    style: fontStyle(
-                                                        12,
-                                                        Colors.green,
-                                                        FontWeight.w600),
+                                                    '৳${double.tryParse('${controller.allproductsList[index]['discount']}'.replaceAll(',', ''))?.toStringAsFixed(2) ?? '0.00'}',
+                                                    style: fontStyle(12, Colors.green, FontWeight.w600),
                                                   ),
-                                                  if (controller
-                                                          .allproductsList[
-                                                              index]
-                                                              ['discount_type']
-                                                          ?.toLowerCase() ==
-                                                      'percent')
-                                                    Text(
-                                                      '% Off',
-                                                      style: fontStyle(
-                                                          12,
-                                                          Colors.green,
-                                                          FontWeight.w600),
-                                                    ),
-                                                  if (controller
-                                                          .allproductsList[
-                                                              index]
-                                                              ['discount_type']
-                                                          ?.toLowerCase() !=
-                                                      'percent')
-                                                    Text(
-                                                      ' ${controller.allproductsList[index]['discount_type']}',
-                                                      style: fontStyle(
-                                                          11,
-                                                          Colors.green,
-                                                          FontWeight.w600),
-                                                    ),
+                                                  if (controller.allproductsList[index]['discount_type']?.toLowerCase() == 'percent')
+                                                    Text('% Off', style: fontStyle(12, Colors.green, FontWeight.w600)),
+                                                  if (controller.allproductsList[index]['discount_type']?.toLowerCase() != 'percent')
+                                                    Text(' ${controller.allproductsList[index]['discount_type']}', style: fontStyle(11, Colors.green, FontWeight.w600)),
                                                 ],
                                               ),
                                             ],
                                           ),
-
-                                          // Display either the "ADD" button or quantity control buttons
-                                          int.parse(cartProviders
-                                                      .getProductQuantityById(
-                                                          controller.allproductsList[index]['id'])
-                                                      .toString()) ==
-                                                  0
+                                          cartProviders.getProductQuantityById(controller.allproductsList[index]['id']) == 0
                                               ? InkWell(
                                                   onTap: isProductAvailable(controller.allproductsList[index])
                                                       ? () {
                                                           setState(() {
-                                                            productQuantities[controller
-                                                                        .allproductsList[
-                                                                    index]
-                                                                    ['id']] = (productQuantities[
-                                                                        controller.allproductsList[
-                                                                                index]
-                                                                            ['id']] ??
-                                                                    0) +
-                                                                1;
-                                                            showQuantityButtons =
-                                                                true;
+                                                            productQuantities[controller.allproductsList[index]['id']] =
+                                                                (productQuantities[controller.allproductsList[index]['id']] ?? 0) + 1;
+                                                            showQuantityButtons = true;
                                                           });
-                                                          SchedulerBinding.instance
-                                                              .addPostFrameCallback(
-                                                                  (_) {
-                                                            addToCart(index);
-                                                          });
+                                                          SchedulerBinding.instance.addPostFrameCallback((_) { addToCart(index); });
                                                         }
                                                       : null,
                                                   child: Container(
                                                     height: 28.h,
                                                     width: 80.w,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal: 10.w,
-                                                      vertical: 5.h,
-                                                    ),
+                                                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                                                     decoration: BoxDecoration(
                                                       color: productStatusColor(controller.allproductsList[index]),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
+                                                      borderRadius: BorderRadius.circular(5),
                                                     ),
-                                                    child: Center(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            productStatusLabel(controller.allproductsList[index]),
-                                                            style: fontStyle(
-                                                              10.sp,
-                                                              Colors.white,
-                                                              FontWeight.w400,
-                                                            ),
-                                                          ),
-                                                          if (isProductAvailable(controller.allproductsList[index]))
-                                                            const Icon(
-                                                              Icons.add,
-                                                              color: Colors.white,
-                                                              size: 18,
-                                                            )
-                                                        ],
-                                                      ),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text(productStatusLabel(controller.allproductsList[index]), style: fontStyle(10.sp, Colors.white, FontWeight.w400)),
+                                                        if (isProductAvailable(controller.allproductsList[index]))
+                                                          const Icon(Icons.add, color: Colors.white, size: 18),
+                                                      ],
                                                     ),
                                                   ),
                                                 )
                                               : Row(
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
-                                                    ///decrement cart quantity
                                                     InkWell(
                                                       onTap: () {
                                                         setState(() {
-                                                          var quantity =
-                                                              cartProviders
-                                                                  .getProductQuantityById(
-                                                            controller
-                                                                    .allproductsList[
-                                                                index]['id'],
-                                                          );
-                                                          quantity--;
-
-                                                          cartProviders
-                                                              .updateQuantityById(
-                                                            controller
-                                                                    .allproductsList[
-                                                                index]['id'],
-                                                            quantity,
-                                                          );
+                                                          var q = cartProviders.getProductQuantityById(controller.allproductsList[index]['id']);
+                                                          cartProviders.updateQuantityById(controller.allproductsList[index]['id'], q - 1);
                                                         });
                                                       },
                                                       child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(25),
-                                                          color: ColorPalette
-                                                              .primaryColor,
-                                                        ),
-                                                        child: const Icon(
-                                                          Icons.remove,
-                                                          color: Colors.white,
-                                                        ),
+                                                        padding: const EdgeInsets.all(4),
+                                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: ColorPalette.primaryColor),
+                                                        child: const Icon(Icons.remove, color: Colors.white, size: 16),
                                                       ),
                                                     ),
-
-                                                    ///cart quantity
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10.0),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
                                                       child: Text(
-                                                        '${int.parse(cartProviders.getProductQuantityById(controller.allproductsList[index]['id']).toString())}',
-                                                        style: fontStyle(
-                                                          18,
-                                                          const Color.fromARGB(
-                                                              255, 184, 11, 11),
-                                                          FontWeight.w400,
-                                                        ),
+                                                        '${cartProviders.getProductQuantityById(controller.allproductsList[index]['id'])}',
+                                                        style: fontStyle(14, const Color.fromARGB(255, 184, 11, 11), FontWeight.w400),
                                                       ),
                                                     ),
-
-                                                    ///inecrement cart quantity
                                                     InkWell(
                                                       onTap: () {
                                                         setState(() {
-                                                          var quantity =
-                                                              cartProviders
-                                                                  .getProductQuantityById(
-                                                            controller
-                                                                    .allproductsList[
-                                                                index]['id'],
-                                                          );
-                                                          quantity++;
-
-                                                          cartProviders
-                                                              .updateQuantityById(
-                                                            controller
-                                                                    .allproductsList[
-                                                                index]['id'],
-                                                            quantity,
-                                                          );
+                                                          var q = cartProviders.getProductQuantityById(controller.allproductsList[index]['id']);
+                                                          cartProviders.updateQuantityById(controller.allproductsList[index]['id'], q + 1);
                                                         });
                                                       },
                                                       child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(25),
-                                                          color: ColorPalette
-                                                              .primaryColor,
-                                                        ),
-                                                        child: const Icon(
-                                                          Icons.add,
-                                                          color: Colors.white,
-                                                        ),
+                                                        padding: const EdgeInsets.all(4),
+                                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: ColorPalette.primaryColor),
+                                                        child: const Icon(Icons.add, color: Colors.white, size: 16),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                         ],
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
@@ -696,54 +568,23 @@ class _AllProductSectionState extends State<AllProductSection> {
                               right: 15.w,
                               child: GestureDetector(
                                 onTap: () async {
-                                  // Toggle the favorite status in the provider
-                                  favoriteProvider.toggleFavorite(
-                                      controller.allproductsList[index]['id']);
-                                  // Perform the appropriate action based on the updated status
-                                  if (favoriteProvider.isFavorite(controller
-                                      .allproductsList[index]['id'])) {
-                                    // If the product is now in the wishlist, add it
-                                    await addToWishlist(controller
-                                        .allproductsList[index]['id']);
+                                  favoriteProvider.toggleFavorite(controller.allproductsList[index]['id']);
+                                  if (favoriteProvider.isFavorite(controller.allproductsList[index]['id'])) {
+                                    await addToWishlist(controller.allproductsList[index]['id']);
                                   } else {
                                     int? wishlistId;
-
                                     for (var item in _wishlistItems) {
-                                      String productId = item['product_id'];
-                                      int wishlistProductId =
-                                          int.tryParse(productId) ?? -1;
-
-                                      // Print productId and wishlistProductId to see their values
-                                      print(
-                                          'productId: $productId, wishlistProductId: $wishlistProductId');
-
-                                      if (wishlistProductId ==
-                                          controller.allproductsList[index]
-                                              ['id']) {
+                                      int wid = int.tryParse('${item['product_id']}') ?? -1;
+                                      if (wid == controller.allproductsList[index]['id']) {
                                         wishlistId = item['id'];
                                         break;
                                       }
                                     }
-
-                                    // Print wishlistId to see if it was found
-                                    print('wishlistId: $wishlistId');
-
-                                    // Pass the retrieved wishlist ID to removeFromWishlist
-                                    if (wishlistId != null) {
-                                      // Check if wishlistId was found
-                                      await removeFromWishlist(wishlistId);
-                                    } else {
-                                      print(
-                                          'Wishlist ID not found for the product.');
-                                    }
+                                    if (wishlistId != null) await removeFromWishlist(wishlistId);
                                   }
                                 },
                                 child: Icon(
-                                  // Use isFavorite method to determine the initial state of the favorite icon
-                                  favoriteProvider.isFavorite(controller
-                                          .allproductsList[index]['id'])
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
+                                  favoriteProvider.isFavorite(controller.allproductsList[index]['id']) ? Icons.favorite : Icons.favorite_border,
                                   color: const Color(0xffE40404),
                                 ),
                               ),
@@ -752,16 +593,6 @@ class _AllProductSectionState extends State<AllProductSection> {
                         );
                       },
                     ),
-                    // child: GridView.builder(
-                    //   shrinkWrap: true,
-                    //   scrollDirection: Axis.horizontal,
-                    //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    //     crossAxisCount: 1,
-                    //     mainAxisSpacing: 10,
-                    //     mainAxisExtent: 260,
-                    //   ),
-
-                    // ),
                   ),
                 )
         ],

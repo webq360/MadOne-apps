@@ -12,10 +12,14 @@ import 'package:http/http.dart' as http;
 import 'package:omnicare_app/ui/widgets/home/search_product_screen.dart';
 import 'package:omnicare_app/util/app_constants.dart';
 
-class CustomAppBar extends StatefulWidget {
+class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Function(bool) onNotificationUpdate;
 
   const CustomAppBar({super.key, required this.onNotificationUpdate});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
 }
@@ -135,121 +139,98 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: Row(
-          children: [
-            ///logo
-            Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Image.asset(
-                ImageAssets.landscapeLogo,
-                width: 100.w,
-                height: 40.h,
-              ),
-            ),
-            const Spacer(),
-
-            ///search bar
-            SizedBox(
-              height: 40,
-              width: 130,
-              child: TextButton(
-                onPressed: () {
-                  Get.to(() => const SearchedProductScreen());
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  height: 100,
-                  width: 170,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.search, size: 15),
-                      SizedBox(width: 6.w),
-                      const Text(
-                        "Search Product",
-                        style: TextStyle(color: Colors.grey, fontSize: 10),
-                      ),
-                    ],
-                  ),
+    return AppBar(
+      elevation: 0,
+      titleSpacing: 0,
+      title: Row(
+        children: [
+          SizedBox(width: 8.w),
+          // Logo
+          Image.asset(
+            ImageAssets.landscapeLogo,
+            width: 90.w,
+            height: 36.h,
+          ),
+          SizedBox(width: 8.w),
+          // Search bar
+          Expanded(
+            child: GestureDetector(
+              onTap: () => Get.to(() => const SearchedProductScreen()),
+              child: Container(
+                height: 34.h,
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, size: 16, color: Colors.grey),
+                    SizedBox(width: 4.w),
+                    const Text(
+                      'Search Product',
+                      style: TextStyle(color: Colors.grey, fontSize: 11),
+                    ),
+                  ],
                 ),
               ),
             ),
-
-            ///call option
-            InkWell(
-              onTap: () {
-                // FlutterPhoneDirectCaller.callNumber(phoneNumber);
-              },
-              child: SvgPicture.asset(
-                ImageAssets.callIconSVG,
-                height: 20.h,
-                width: 20.w,
-              ),
+          ),
+          SizedBox(width: 8.w),
+          // Call
+          InkWell(
+            onTap: () {},
+            child: SvgPicture.asset(
+              ImageAssets.callIconSVG,
+              height: 20.h,
+              width: 20.w,
             ),
-            SizedBox(width: 10.w),
-
-            ///notification
-            Stack(
-              children: [
-                InkWell(
-                  onTap: () {
+          ),
+          SizedBox(width: 10.w),
+          // Notification
+          Stack(
+            children: [
+              InkWell(
+                onTap: () {
+                  setState(() => isNotificationScreenVisible = true);
+                  Get.to(() => NotificationScreen(
+                        onNotificationUpdate: handleNotificationUpdate,
+                      ))?.then((_) {
                     setState(() {
-                      isNotificationScreenVisible = true;
+                      isNotificationScreenVisible = false;
+                      _checkForNewNotifications();
                     });
-                    Get.to(
-                      () => NotificationScreen(
-                        onNotificationUpdate:
-                            handleNotificationUpdate, // Pass the callback function
-                      ),
-                    )?.then((_) {
-                      setState(() {
-                        isNotificationScreenVisible = false;
-                        _checkForNewNotifications();
-                      });
-                    });
-                  },
-                  child: SvgPicture.asset(
-                    ImageAssets.notificationIconSVG,
-                    height: 20.h,
-                    width: 20.w,
-                  ),
+                  });
+                },
+                child: SvgPicture.asset(
+                  ImageAssets.notificationIconSVG,
+                  height: 20.h,
+                  width: 20.w,
                 ),
-                if (showNotificationDot && !isNotificationScreenVisible)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
+              ),
+              if (showNotificationDot && !isNotificationScreenVisible)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
                     ),
                   ),
-              ],
-            ),
-            SizedBox(width: 10.w),
-
-            ///wishlist icon buttoon
-            InkWell(
-              onTap: () {
-                Get.to(() => const WishlistScreen());
-              },
-              radius: 100.r,
-              child: const Icon(
-                Icons.favorite,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
+                ),
+            ],
+          ),
+          SizedBox(width: 10.w),
+          // Wishlist
+          InkWell(
+            onTap: () => Get.to(() => const WishlistScreen()),
+            child: const Icon(Icons.favorite, color: Colors.white, size: 22),
+          ),
+          SizedBox(width: 8.w),
+        ],
       ),
     );
   }

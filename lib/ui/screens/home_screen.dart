@@ -65,15 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: CustomAppBar(
+      appBar: CustomAppBar(
           onNotificationUpdate: (hasUpdate) {
-            // Handle notification update from CustomAppBar
             print('Notification Update Received: $hasUpdate');
           },
         ),
-      ),
       body: Obx(() {
         if (homeController.isLoading.value) {
           return Center(child: CircularProgressIndicator());

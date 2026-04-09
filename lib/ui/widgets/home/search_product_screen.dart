@@ -393,8 +393,9 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
   Future<void> searchProduct(String query) async {
     try {
       setState(() => isLoading = true);
-      final response = await http.get(
-        Uri.parse('${AppConstants.searchProduct}?query=$query'),
+      final response = await http.post(
+        Uri.parse(AppConstants.searchProduct),
+        body: {'query': query},
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -406,10 +407,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
             isFavouriteList = List.filled(searchResults.length, false);
           });
         } else {
-          print('Invalid search results format.');
+          setState(() => searchResults.clear());
         }
-      } else {
-        print('Failed to search. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error during product search: $error');
@@ -466,6 +465,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                           margin: const EdgeInsets.symmetric(horizontal: 10),
                           child: TextField(
                             controller: searchController,
+                            autofocus: true,
                             onChanged: (String query) async {
                               runFilter(query);
                             },

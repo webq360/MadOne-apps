@@ -12,13 +12,15 @@ TextStyle fontStyle([double? size, Color? clr, FontWeight? fw]) {
 Color productStatusColor(Map<String, dynamic>? product) {
   if (product == null) return const Color(0xff006B9C);
   if (product['is_stockout'] == 1 || product['is_stockout'] == true) return Colors.red;
+  if ((product['quantity'] ?? 1) == 0 && product['pre_order'] != 1) return Colors.red;
   if (product['pre_order'] == 1 || product['pre_order'] == true) return Colors.orange;
   return const Color(0xff006B9C);
 }
 
 String productStatusLabel(Map<String, dynamic>? product) {
   if (product == null) return 'ADD';
-  if (product['is_stockout'] == 1 || product['is_stockout'] == true) return 'Stock Out';
+  if (product['is_stockout'] == 1 || product['is_stockout'] == true) return 'Not Available';
+  if ((product['quantity'] ?? 1) == 0 && product['pre_order'] != 1) return 'Not Available';
   if (product['pre_order'] == 1 || product['pre_order'] == true) return 'Pre Order';
   return 'ADD';
 }
@@ -26,6 +28,7 @@ String productStatusLabel(Map<String, dynamic>? product) {
 bool isProductAvailable(Map<String, dynamic>? product) {
   if (product == null) return true;
   if (product['is_stockout'] == 1 || product['is_stockout'] == true) return false;
+  if ((product['quantity'] ?? 1) == 0 && product['pre_order'] != 1) return false;
   return true; // pre_order products CAN be ordered
 }
 

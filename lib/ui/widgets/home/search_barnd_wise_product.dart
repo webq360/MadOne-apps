@@ -427,8 +427,9 @@ class _SearchedBrandWiseProductScreenState
       });
 
       ///https://stage.medone.primeharvestbd.com/api//brand_wise_product/9 //check post api or get api
-      final response = await http.get(
-        Uri.parse('${AppConstants.searchBrandProduct(widget.brandId)}?query=$query'),
+      final response = await http.post(
+        Uri.parse(AppConstants.searchBrandProduct(widget.brandId)),
+        body: {'query': query},
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);

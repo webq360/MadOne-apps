@@ -152,7 +152,7 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
             ],
           ),
           SizedBox(
-            height: 260.h,
+            height: 270.h,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 5.h),
               child: ListView.builder(
@@ -174,6 +174,7 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                           () => ProductDetailsScreen(productDetails: product),
                         ),
                         child: Container(
+                          clipBehavior: Clip.hardEdge,
                           padding: EdgeInsets.all(8.w),
                           margin: EdgeInsets.only(right: 5.w),
                           width: 155.w,
@@ -322,6 +323,7 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                             ),
                                           )
                                         : Row(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
                                               InkWell(
                                                 onTap: () {
@@ -337,7 +339,7 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                                 },
                                                 child: Container(
                                                   padding:
-                                                      const EdgeInsets.all(5),
+                                                      const EdgeInsets.all(4),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -347,16 +349,17 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                                   ),
                                                   child: const Icon(
                                                       Icons.remove,
-                                                      color: Colors.white),
+                                                      color: Colors.white,
+                                                      size: 16),
                                                 ),
                                               ),
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.all(10.0),
+                                                    const EdgeInsets.symmetric(horizontal: 6.0),
                                                 child: Text(
                                                   '${cartProvider.getProductQuantityById(productId)}',
                                                   style: fontStyle(
-                                                      18,
+                                                      14,
                                                       const Color.fromARGB(
                                                           255, 184, 11, 11),
                                                       FontWeight.w400),
@@ -376,7 +379,7 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                                 },
                                                 child: Container(
                                                   padding:
-                                                      const EdgeInsets.all(5),
+                                                      const EdgeInsets.all(4),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -385,7 +388,8 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                                         .primaryColor,
                                                   ),
                                                   child: const Icon(Icons.add,
-                                                      color: Colors.white),
+                                                      color: Colors.white,
+                                                      size: 16),
                                                 ),
                                               ),
                                             ],

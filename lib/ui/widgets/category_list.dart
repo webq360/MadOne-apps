@@ -4,14 +4,41 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:omnicare_app/controller/product_controller.dart';
 import 'package:omnicare_app/ui/screens/category_wise_product_screen.dart';
+import 'package:omnicare_app/ui/utils/color_palette.dart';
 
 class CategoryList extends StatelessWidget {
   CategoryList({super.key});
 
   final ProductController controller = Get.find<ProductController>();
 
-  final String baseImageUrl =
-      "https://stage.medone.primeharvestbd.com/uploads/category/";
+  // Same base path used by product images on this server
+  static const String _baseImageUrl =
+      'https://stage.medone.primeharvestbd.com//public/uploads/';
+
+  String _buildImageUrl(String? imageName) {
+    if (imageName == null || imageName.isEmpty) return '';
+    // If already a full URL, return as-is
+    if (imageName.startsWith('http')) return imageName;
+    // Backend stores category images in same uploads folder as products
+    return 'https://stage.medone.primeharvestbd.com//public/uploads/$imageName';
+  }
+
+  Widget _placeholder(String name) {
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+    return Container(
+      color: ColorPalette.primaryColor.withOpacity(0.1),
+      child: Center(
+        child: Text(
+          initial,
+          style: TextStyle(
+            fontSize: 22.sp,
+            fontWeight: FontWeight.bold,
+            color: ColorPalette.primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +47,14 @@ class CategoryList extends StatelessWidget {
           controller.featuredCategoryList.isEmpty) {
         return const Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
+          child: Center(child: CircularProgressIndicator()),
         );
       }
 
       if (controller.featuredCategoryList.isEmpty) {
         return const Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: Center(
-            child: Text('No category found'),
-          ),
+          child: Center(child: Text('No category found')),
         );
       }
 
@@ -48,17 +71,9 @@ class CategoryList extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           final category = controller.featuredCategoryList[index];
-
-          final String name =
-              category['category_name']?.toString() ?? 'No Name';
-
-          final String imageName =
-              category['category_image']?.toString() ?? '';
-
+          final String name = category['category_name']?.toString() ?? 'No Name';
+          final String imageUrl = _buildImageUrl(category['category_image']?.toString());
           final int categoryId = category['id'] ?? 0;
-
-          final String imageUrl =
-              imageName.isNotEmpty ? "$baseImageUrl$imageName" : "";
 
           return InkWell(
             borderRadius: BorderRadius.circular(12.r),
@@ -67,7 +82,6 @@ class CategoryList extends StatelessWidget {
                 categoryId: categoryId,
                 categoryName: name,
               );
-
               Get.to(() => const CategoryWiseProductScreen());
             },
             child: Container(
@@ -102,15 +116,14 @@ class CategoryList extends StatelessWidget {
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
+                                        strokeWidth: 2),
                                   ),
                                 ),
                               ),
                               errorWidget: (context, url, error) =>
-                                  const Icon(Icons.image_not_supported),
+                                  _placeholder(name),
                             )
-                          : const Icon(Icons.image_not_supported),
+                          : _placeholder(name),
                     ),
                   ),
                   SizedBox(height: 6.h),
