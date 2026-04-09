@@ -47,7 +47,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
+        Uri.parse('https://app.medonetrade.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -86,7 +86,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
+          'https://app.medonetrade.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -238,7 +238,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
+    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
 
     try {
       final response = await http.post(

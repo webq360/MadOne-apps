@@ -43,7 +43,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://stage.medone.primeharvestbd.com/api/orderlist'),
+        Uri.parse('https://app.medonetrade.com/api/orderlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       log('Fetch Order Data status code: ${response.statusCode}');
@@ -98,7 +98,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
+    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),

@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String baseUrl = 'https://stage.medone.primeharvestbd.com/api';
+  static const String baseUrl = 'https://app.medonetrade.com/api';
 
   // Auth
   static const String login = '$baseUrl/login';

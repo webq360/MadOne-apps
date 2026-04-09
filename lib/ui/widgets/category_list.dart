@@ -13,14 +13,14 @@ class CategoryList extends StatelessWidget {
 
   // Same base path used by product images on this server
   static const String _baseImageUrl =
-      'https://stage.medone.primeharvestbd.com//public/uploads/';
+      'https://app.medonetrade.com//public/uploads/';
 
   String _buildImageUrl(String? imageName) {
     if (imageName == null || imageName.isEmpty) return '';
     // If already a full URL, return as-is
     if (imageName.startsWith('http')) return imageName;
     // Backend stores category images in same uploads folder as products
-    return 'https://stage.medone.primeharvestbd.com//public/uploads/$imageName';
+    return 'https://app.medonetrade.com//public/uploads/$imageName';
   }
 
   Widget _placeholder(String name) {

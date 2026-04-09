@@ -26,7 +26,7 @@ class CompanyController extends GetxController {
         companyList.assignAll(companiesFromHive);
       } else {
         final response = await http.get(Uri.parse(
-            'https://stage.medone.primeharvestbd.com/api/all_brands'));
+            'https://app.medonetrade.com/api/all_brands'));
         if (response.statusCode == 200) {
           print('Data fetched from API');
           // Rest of the code...

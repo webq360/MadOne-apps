@@ -139,7 +139,7 @@ class _SearchedBrandWiseProductScreenState
     //     isLoading = true;
     //   });
     //   final response =
-    //       await http.get(Uri.parse('https://stage.medone.primeharvestbd.com/api/'));
+    //       await http.get(Uri.parse('https://app.medonetrade.com/api/'));
     //   if (response.statusCode == 200) {
     //     final json = jsonDecode(response.body);
     //     if (json['all_products'] is List) {
@@ -426,7 +426,7 @@ class _SearchedBrandWiseProductScreenState
         isLoading = true;
       });
 
-      ///https://stage.medone.primeharvestbd.com/api//brand_wise_product/9 //check post api or get api
+      ///https://app.medonetrade.com/api//brand_wise_product/9 //check post api or get api
       final response = await http.post(
         Uri.parse(AppConstants.searchBrandProduct(widget.brandId)),
         body: {'query': query},
