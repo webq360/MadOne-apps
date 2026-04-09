@@ -57,15 +57,15 @@ class CartItem {
 
   // Factory constructor to parse JSON into CartItem object
   factory CartItem.fromJson(Map<String, dynamic> json) {
-    String company_name = json['company_name'] != null ? json['company_name'] : 'Unknown';
-    print('Company Name: $company_name');
+    String companyName = json['company_name'] ?? 'Unknown';
+    print('Company Name: $companyName');
     print('Brand JSON: ${json['brand']}');
     print('Brand Name: ${json['brand'] != null ? json['brand']['brand_name'] : 'Unknown'}');
     return CartItem(
       id: json['id'],
       image: json['image'],
       name: json['name'],
-      company_name: company_name,
+      company_name: companyName,
       //company_name: json['brand'] != null ? json['brand']['brand_name'] ?? 'Unknown' : 'Unknown',
       sell_price: json['sell_price'],
       after_discount_price: json['after_discount_price'],

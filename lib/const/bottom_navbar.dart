@@ -163,7 +163,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     );
   }
 
-  showDialogBox(BuildContext context) => showCupertinoDialog<String>(
+  Future<String?> showDialogBox(BuildContext context) => showCupertinoDialog<String>(
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
           title: const Text("No Connection"),

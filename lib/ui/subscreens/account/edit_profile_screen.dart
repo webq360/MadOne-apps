@@ -14,6 +14,7 @@ import 'package:omnicare_app/ui/screens/account_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:omnicare_app/util/app_constants.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -136,7 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/profile'),
+        Uri.parse(AppConstants.profile),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print(
@@ -168,7 +169,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/profile'),
+        Uri.parse(AppConstants.profile),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print('Fetch Store Name status code: ${response.statusCode}');
@@ -223,7 +224,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // Function to refresh the access token
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
+    const String apiUrl = AppConstants.refresh;
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -247,11 +248,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<List<Zone>> fetchZones() async {
     final response = await http
-        .get(Uri.parse('https://app.medonetrade.com/api/zones'));
+        .get(Uri.parse('${AppConstants.baseUrl}/zones'));
     if (response.statusCode == 200) {
       Iterable data = json.decode(response.body)['zones'];
       // Use a set to ensure unique zones based on their ID
-      Set<int> uniqueZoneIds = Set();
+      Set<int> uniqueZoneIds = {};
       List<Zone> uniqueZones = [];
       for (var model in data) {
         Zone zone = Zone.fromJson(model);
@@ -290,7 +291,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         // API endpoint for updating pharmacy information
         final String apiUrl =
-            'https://app.medonetrade.com/api/pharmacy/update/$pharmacyId';
+            '${AppConstants.baseUrl}/pharmacy/update/$pharmacyId';
         // Construct the request headers with the authorization token
         Map<String, String> headers = {
           'Authorization': 'Bearer $authToken',
@@ -480,9 +481,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     SizedBox(
                       height: 10.h,
                     ),
-                    Text('$storeName'),
+                    Text(storeName),
                     Text(
-                      '$emailAddress',
+                      emailAddress,
                       style: const TextStyle(color: Colors.green),
                     ),
                     SizedBox(
@@ -536,7 +537,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 15.h),
                     DropdownButtonFormField<String>(
-                      value: selectedZoneName,
+                      initialValue: selectedZoneName,
                       items: zones.map((Zone zone) {
                         return DropdownMenuItem<String>(
                           value: zone.zoneName,
@@ -572,7 +573,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     SizedBox(
                       height: 20.h,
                     ),
-                    Container(
+                    SizedBox(
                       width: 100.0,
                       height: 40.0,
                       child: MaterialButton(

@@ -20,11 +20,12 @@ import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:omnicare_app/util/app_constants.dart';
 
 class SearchedProductScreen extends StatefulWidget {
   const SearchedProductScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<SearchedProductScreen> createState() => _SearchedProductScreenState();
@@ -42,6 +43,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
   // Map to store quantity for each product
   Map<int, dynamic> productQuantities = {};
   List<Map<String, dynamic>> _wishlistItems = [];
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -65,7 +67,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api//wishlist'),
+        Uri.parse(AppConstants.wishlist),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -104,31 +106,23 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
 
   Future<void> allProducts() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      setState(() => isLoading = true);
       final response = await http.get(Uri.parse(
-          'https://app.medonetrade.com/api//all_products_list'));
+          AppConstants.allProducts));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (json['data'] is List) {
           setState(() {
             allproductsList = List<Map<String, dynamic>>.from(json['data']);
           });
-          print(allproductsList);
-        } else {
-          print('Invalid data format for featured products.');
         }
       } else {
-        print(
-            'Failed to load company names. Status code: ${response.statusCode}');
+        print('Failed to load products. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error: $error');
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     }
     Provider.of<CartProvider>(context, listen: false).notifyListeners();
   }
@@ -139,8 +133,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
     if (accessToken != null) {
       try {
         final response = await http.get(
-          Uri.parse(
-              'https://app.medonetrade.com/api//addToWishlist/$productId'),
+          Uri.parse(AppConstants.addToWishlist(productId)),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -183,8 +176,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         print('Authorization token is missing.');
         return;
       }
-      final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api//removeFromWishlist/$wishlistId');
+      final Uri url = Uri.parse(AppConstants.removeFromWishlist(wishlistId));
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -263,7 +255,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
 
   Future<String?> _refreshToken(String refreshToken) async {
     const String apiUrl =
-        'https://app.medonetrade.com/api//refresh';
+        AppConstants.refresh;
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -391,14 +383,18 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> searchProduct(String query) async {
     try {
-      setState(() {
-        isLoading = true;
-      });
-      final response = await http.post(
-        Uri.parse(
-            'https://app.medonetrade.com/api//search_product?query=$query'),
+      setState(() => isLoading = true);
+      final response = await http.get(
+        Uri.parse('${AppConstants.searchProduct}?query=$query'),
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -407,39 +403,30 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
           setState(() {
             searchResults =
                 List<Map<String, dynamic>>.from(json['suggested_products']);
-            isFavouriteList = List.filled(allproductsList.length, false);
+            isFavouriteList = List.filled(searchResults.length, false);
           });
         } else {
           print('Invalid search results format.');
         }
       } else {
-        print(
-            'Failed to load search results. Status code: ${response.statusCode}');
+        print('Failed to search. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error during product search: $error');
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     }
   }
 
   void runFilter(String enteredKeyword) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
     if (enteredKeyword.isEmpty) {
-      setState(() {
-        searchResults.clear();
-      });
-    } else {
-      setState(() {
-        searchResults = allproductsList
-            .where((product) => product['name']
-                .toString()
-                .toLowerCase()
-                .contains(enteredKeyword.toLowerCase()))
-            .toList();
-      });
+      setState(() => searchResults.clear());
+      return;
     }
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      searchProduct(enteredKeyword);
+    });
   }
 
   @override
@@ -646,7 +633,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                           Row(
                             children: [
                               Text(
-                                '৳${double.parse(product['discount']).toStringAsFixed(2)}',
+                                '৳${double.tryParse('${product['discount']}'.replaceAll(',', ''))?.toStringAsFixed(2) ?? '0.00'}',
                                 style: fontStyle(
                                     12.sp, Colors.green, FontWeight.w600),
                               ),
@@ -676,23 +663,19 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                                   .toString()) ==
                               0
                           ? InkWell(
-                              onTap: () {
-                                setState(() {
-                                  productQuantities[itemList[index]['id']] =
-                                      (productQuantities[itemList[index]
-                                                  ['id']] ??
-                                              0) +
-                                          1;
-                                  showQuantityButtons = true;
-                                });
-                                SchedulerBinding.instance
-                                    .addPostFrameCallback((_) {
-                                  addToCart(
-                                    index,
-                                    itemList,
-                                  ); // Pass index of allproductsList
-                                });
-                              },
+                              onTap: isProductAvailable(product)
+                                  ? () {
+                                      setState(() {
+                                        productQuantities[itemList[index]['id']] =
+                                            (productQuantities[itemList[index]['id']] ?? 0) + 1;
+                                        showQuantityButtons = true;
+                                      });
+                                      SchedulerBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        addToCart(index, itemList);
+                                      });
+                                    }
+                                  : null,
                               child: Container(
                                 height: 28.h,
                                 width: 80.w,
@@ -701,24 +684,19 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                                   vertical: 5.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: ColorPalette.primaryColor,
+                                  color: productStatusColor(product),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Center(
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'ADD',
-                                        style: fontStyle(12.sp, Colors.white,
-                                            FontWeight.w400),
+                                        productStatusLabel(product),
+                                        style: fontStyle(10.sp, Colors.white, FontWeight.w400),
                                       ),
-                                      const Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                        size: 18,
-                                      )
+                                      if (isProductAvailable(product))
+                                        const Icon(Icons.add, color: Colors.white, size: 18),
                                     ],
                                   ),
                                 ),

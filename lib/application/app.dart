@@ -9,6 +9,9 @@ import 'package:omnicare_app/services/cart_provider.dart';
 import 'package:omnicare_app/ui/splash_screen.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:provider/provider.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class OmniCare extends StatelessWidget {
 
   const OmniCare({super.key});
@@ -23,6 +26,7 @@ class OmniCare extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => FavoriteProvider()),
         ],
         child: GetMaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'OmniCare',
           theme: ThemeData(

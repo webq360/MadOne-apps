@@ -65,7 +65,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api//wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -97,7 +97,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
       try {
         final response = await http.get(
           Uri.parse(
-              'https://app.medonetrade.com/api//addToWishlist/$productId'),
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -141,7 +141,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api//removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -217,7 +217,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
 
   Future<String?> _refreshToken(String refreshToken) async {
     final String apiUrl =
-        'https://app.medonetrade.com/api//refresh';
+        'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -344,7 +344,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
               )
             ],
           ),
-          controller.inProgress.value
+          Obx(() => controller.inProgress.value
               ? SizedBox(
                   height: 160,
                   child: Center(
@@ -354,7 +354,9 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                     ),
                   ),
                 )
-              : Padding(
+              : controller.offeredproductsList.isEmpty
+                  ? const SizedBox()
+                  : Padding(
                   padding: EdgeInsets.symmetric(vertical: 5.h),
                   child: GridView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -500,25 +502,27 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                     .toString()) ==
                                                 0
                                             ? InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    productQuantities[controller
-                                                                .offeredproductsList[
-                                                            index][
-                                                        'id']] = (productQuantities[
-                                                                controller.offeredproductsList[
-                                                                        index]
-                                                                    ['id']] ??
-                                                            0) +
-                                                        1;
-                                                    showQuantityButtons = true;
-                                                  });
-                                                  SchedulerBinding.instance
-                                                      .addPostFrameCallback(
-                                                          (_) {
-                                                    addToCart(index);
-                                                  });
-                                                },
+                                                onTap: isProductAvailable(controller.offeredproductsList[index])
+                                                    ? () {
+                                                        setState(() {
+                                                          productQuantities[controller
+                                                                      .offeredproductsList[
+                                                                  index][
+                                                              'id']] = (productQuantities[
+                                                                      controller.offeredproductsList[
+                                                                              index]
+                                                                          ['id']] ??
+                                                                  0) +
+                                                              1;
+                                                          showQuantityButtons = true;
+                                                        });
+                                                        SchedulerBinding.instance
+                                                            .addPostFrameCallback(
+                                                                (_) {
+                                                          addToCart(index);
+                                                        });
+                                                      }
+                                                    : null,
                                                 child: Container(
                                                   height: 28.h,
                                                   width: 80.w,
@@ -527,12 +531,9 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                     vertical: 5.h,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: ColorPalette
-                                                        .primaryColor,
+                                                    color: productStatusColor(controller.offeredproductsList[index]),
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                      5,
-                                                    ),
+                                                        BorderRadius.circular(5),
                                                   ),
                                                   child: Center(
                                                     child: Row(
@@ -541,18 +542,19 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                               .spaceBetween,
                                                       children: [
                                                         Text(
-                                                          'ADD',
+                                                          productStatusLabel(controller.offeredproductsList[index]),
                                                           style: fontStyle(
-                                                            12.sp,
+                                                            10.sp,
                                                             Colors.white,
                                                             FontWeight.w400,
                                                           ),
                                                         ),
-                                                        const Icon(
-                                                          Icons.add,
-                                                          color: Colors.white,
-                                                          size: 18,
-                                                        )
+                                                        if (isProductAvailable(controller.offeredproductsList[index]))
+                                                          const Icon(
+                                                            Icons.add,
+                                                            color: Colors.white,
+                                                            size: 18,
+                                                          )
                                                       ],
                                                     ),
                                                   ),
@@ -748,6 +750,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                     },
                   ),
                 ),
+          ),
           SizedBox(height: 10.h),
           InkWell(
             onTap: () {

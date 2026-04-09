@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:omnicare_app/hive/home_hive/hive_model.dart'; // Import Hive model classes
 import 'package:omnicare_app/hive/home_hive/home_hive.dart';
+import 'package:omnicare_app/util/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import HiveService
 
 class HomeController extends GetxController {
@@ -67,7 +68,7 @@ class HomeController extends GetxController {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('https://app.medonetrade.com/api/fcm-token'),
+        Uri.parse(AppConstants.fcmToken),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ class HomeController extends GetxController {
     try {
       isLoading.value = true;
       final response = await http
-          .get(Uri.parse('https://app.medonetrade.com/api'));
+          .get(Uri.parse(AppConstants.home));
       final json = jsonDecode(response.body);
 
       final List<dynamic> slidersJson = json['sliders'];

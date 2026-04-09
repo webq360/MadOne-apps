@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:omnicare_app/util/app_constants.dart';
 
 class HomeDataProvider extends ChangeNotifier {
   List<dynamic> sliderList = [];
@@ -21,7 +22,7 @@ class HomeDataProvider extends ChangeNotifier {
 
     try {
       final response = await http
-          .get(Uri.parse('https://app.medonetrade.com/api'));
+          .get(Uri.parse(AppConstants.home));
       final json = jsonDecode(response.body);
       sliderList = json['sliders'];
       bannerList = json['site_settigs'];

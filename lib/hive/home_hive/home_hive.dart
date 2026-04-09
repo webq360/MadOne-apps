@@ -45,18 +45,10 @@ class HiveService {
         bannersBox!.clear(); // Clear the box before putting new data
       }
 
-      final slidersMap = Map<String, HiveSlider>.fromIterable(
-        sliders,
-        key: (slider) => sliders.indexOf(slider).toString(),
-        value: (slider) => slider,
-      );
+      final slidersMap = { for (var slider in sliders) sliders.indexOf(slider).toString() : slider };
       await slidersBox!.putAll(slidersMap);
 
-      final bannersMap = Map<String, HiveBanner>.fromIterable(
-        banners,
-        key: (banner) => banners.indexOf(banner).toString(),
-        value: (banner) => banner,
-      );
+      final bannersMap = { for (var banner in banners) banners.indexOf(banner).toString() : banner };
       await bannersBox!.putAll(bannersMap);
 
       print('Data saved to Hive');

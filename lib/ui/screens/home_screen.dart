@@ -15,6 +15,7 @@ import 'package:omnicare_app/ui/widgets/home/offer_product_section.dart';
 import 'package:omnicare_app/ui/widgets/home/company_section.dart';
 import 'package:omnicare_app/ui/widgets/home/all_product_section.dart';
 import 'package:omnicare_app/ui/widgets/home/see_all_product_screen.dart';
+import 'package:omnicare_app/ui/widgets/home/trending_product_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -188,6 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             CategoryList(),
                           ],
                         ),
+                        SizedBox(height: 20.h),
+                        const TrendingProductSection(),
                         SizedBox(height: 20.h),
                         const AllProductSection(),
                         //const OfferedProductSection(),

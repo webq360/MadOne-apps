@@ -11,7 +11,7 @@ import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/widgets/home/company_product_screen.dart';
 
 class CompanyScreen extends StatefulWidget {
-  const CompanyScreen({Key? key}) : super(key: key);
+  const CompanyScreen({super.key});
 
   @override
   State<CompanyScreen> createState() => _CompanyScreenState();
@@ -35,7 +35,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
         isLoading = true;
       });
       final response = await http.get(
-          Uri.parse('https://app.medonetrade.com/api/all_brands'));
+          Uri.parse('https://stage.medone.primeharvestbd.com/api/all_brands'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);

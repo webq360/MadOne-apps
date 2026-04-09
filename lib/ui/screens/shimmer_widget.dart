@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerWidget extends StatefulWidget {
-  const ShimmerWidget({Key? key}) : super(key: key);
+  const ShimmerWidget({super.key});
 
   @override
   State<ShimmerWidget> createState() => _ShimmerWidgetState();

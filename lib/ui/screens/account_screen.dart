@@ -15,9 +15,10 @@ import 'package:omnicare_app/ui/subscreens/account/wishlist_screen.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:omnicare_app/util/app_constants.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({Key? key}) : super(key: key);
+  const AccountScreen({super.key});
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
@@ -41,7 +42,7 @@ class _AccountScreenState extends State<AccountScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/profile'),
+        Uri.parse(AppConstants.profile),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       print('Fetch Store Name status code: ${response.statusCode}');
@@ -107,7 +108,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   // Function to refresh the access token
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.medonetrade.com/api/refresh';
+    final String apiUrl = AppConstants.refresh;
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -139,7 +140,7 @@ class _AccountScreenState extends State<AccountScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/logout'),
+        Uri.parse(AppConstants.logout),
         headers: {'Authorization': 'Bearer $authToken'},
       );
 
@@ -226,11 +227,11 @@ class _AccountScreenState extends State<AccountScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '$storeName',
+                        storeName,
                         style: fontStyle(14.sp, Colors.black, FontWeight.w600),
                       ),
                       Text(
-                        '$ownerName',
+                        ownerName,
                         style: fontStyle(12.sp, Colors.black),
                       ),
                       Text(

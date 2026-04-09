@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WishlistScreen extends StatefulWidget {
-  const WishlistScreen({Key? key}) : super(key: key);
+  const WishlistScreen({super.key});
 
   @override
   State<WishlistScreen> createState() => _WishlistScreenState();
@@ -47,7 +47,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -86,7 +86,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -145,7 +145,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
             existingItem, existingItem.quantity);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Container(
+            content: SizedBox(
               height: 30.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,7 +181,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         cartProvider.updateQuantity(productId, 1);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Container(
+            content: SizedBox(
               height: 30.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,7 +238,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
 
     try {
       final response = await http.post(

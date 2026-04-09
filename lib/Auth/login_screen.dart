@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
@@ -12,9 +13,10 @@ import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:omnicare_app/util/app_constants.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -49,9 +51,31 @@ class _LoginScreenState extends State<LoginScreen> {
     return "";
   }
 
+  Future<void> _registerFcmToken(int userId, String accessToken) async {
+    try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken == null) return;
+      final deviceType = Platform.isAndroid ? 'android' : 'ios';
+      await http.post(
+        Uri.parse(AppConstants.fcmToken),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'token': fcmToken,
+          'device_type': deviceType,
+          'user_id': userId,
+        }),
+      );
+      log('✅ FCM token registered for user $userId');
+    } catch (e) {
+      log('FCM token registration error: $e');
+    }
+  }
+
   Future<void> _login() async {
     print('Attempting login...');
-    const String apiUrl = 'https://app.medonetrade.com/api/login';
     final String email = emailController.text;
     final String password = passwordController.text;
 
@@ -61,11 +85,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(AppConstants.login),
         body: {'email': email, 'password': password, 'device_id': deviceId},
       );
 
-     
       log('Response received: ${response.statusCode}');
 
       if (response.statusCode == 200) {
@@ -79,22 +102,23 @@ class _LoginScreenState extends State<LoginScreen> {
             authorization['refresh_token'] as String? ?? '';
 
         final int userId = user['id'] as int? ?? 0;
-        final String userName = user['name'] as String? ?? '';
-        final String userEmail = user['email'] as String? ?? '';
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        log("accessToken--------${accessToken}");
-        log("refreshToken--------${refreshToken}");
-        
+        log("accessToken--------$accessToken");
+        log("refreshToken--------$refreshToken");
+
         prefs.setInt('userId', userId);
         prefs.setString('accessToken', accessToken);
         prefs.setString('refreshToken', refreshToken);
 
+        // Register FCM token after successful login
+        await _registerFcmToken(userId, accessToken);
+
         Get.offAll(() => const BottomNavBarScreen());
       } else if (response.statusCode == 401) {
         log("----response.statusCode---${response.statusCode}");
-        log("----response.statusCode---${response}");
+        log("----response.statusCode---$response");
         _showSnackBar('Incorrect email or password. Please try again.');
       } else {
         const errorMessage = 'An error occurred. Please try again later.';
@@ -125,11 +149,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
-
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(AppConstants.refresh),
         body: {
           'refresh_token': refreshToken,
         },
@@ -248,10 +270,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       _login();
                     }
                   },
-                  child: Text('Login', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorPalette.primaryColor,
                   ),
+                  child: Text('Login', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

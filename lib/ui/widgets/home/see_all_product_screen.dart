@@ -38,12 +38,8 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
   bool inProgress = false;
   bool showQuantityButtons = false;
   bool _isUpdatingQuantity = false;
-  // Map to store quantity for each product
   Map<int, int> productQuantities = {};
   List<Map<String, dynamic>> _wishlistItems = [];
-
-  int currentPage = 1;
-  int totalPages = 1;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -51,8 +47,6 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
   void initState() {
     super.initState();
     fetchWishlist();
-    // AllProducts();
-    _scrollController.addListener(_scrollListener);
     fetchProducts();
   }
 
@@ -72,7 +66,7 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api//wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -100,48 +94,23 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
     }
   }
 
-  void _scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      // Reached the end of the list
-      if (currentPage < totalPages) {
-        currentPage++;
-        fetchProducts();
-      }
-    }
-  }
-
   Future<void> fetchProducts() async {
-    if (currentPage > totalPages) return;
-
-    setState(() {
-      inProgress = true;
-    });
-
+    setState(() => inProgress = true);
     try {
       final response = await http.get(
-        Uri.parse(
-            'https://app.medonetrade.com/api//all_products?page=$currentPage'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/all_products'),
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        if (mounted) {
-          setState(() {
-            if (json['last_page'] != null) {
-              totalPages = json['last_page'];
-            }
-            allproductsList.addAll(json['data']);
-          });
-        }
+        final list = json['data'] ?? json['all_products'] ?? [];
+        if (mounted) setState(() => allproductsList = List.from(list));
       } else {
         print('Failed to load products. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error: $error');
     } finally {
-      setState(() {
-        inProgress = false;
-      });
+      if (mounted) setState(() => inProgress = false);
     }
   }
 
@@ -152,7 +121,7 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              'https://app.medonetrade.com/api//addToWishlist/$productId'),
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
       } catch (error) {
@@ -181,7 +150,7 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api//removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -258,7 +227,7 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
 
   Future<String?> _refreshToken(String refreshToken) async {
     const String apiUrl =
-        'https://app.medonetrade.com/api//refresh';
+        'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -517,26 +486,27 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
                                                       .toString()) ==
                                                   0
                                               ? InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      productQuantities[
-                                                          allproductsList[index]
-                                                              [
-                                                              'id']] = (productQuantities[
-                                                                  allproductsList[
-                                                                          index]
-                                                                      ['id']] ??
-                                                              0) +
-                                                          1;
-                                                      showQuantityButtons =
-                                                          true;
-                                                    });
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback(
-                                                            (_) {
-                                                      addToCart(index);
-                                                    });
-                                                  },
+                                                  onTap: isProductAvailable(allproductsList[index])
+                                                      ? () {
+                                                          setState(() {
+                                                            productQuantities[
+                                                                allproductsList[index]
+                                                                    ['id']] = (productQuantities[
+                                                                        allproductsList[
+                                                                                index]
+                                                                            ['id']] ??
+                                                                    0) +
+                                                                1;
+                                                            showQuantityButtons =
+                                                                true;
+                                                          });
+                                                          SchedulerBinding.instance
+                                                              .addPostFrameCallback(
+                                                                  (_) {
+                                                            addToCart(index);
+                                                          });
+                                                        }
+                                                      : null,
                                                   child: Container(
                                                     height: 28.h,
                                                     width: 80.w,
@@ -546,8 +516,7 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
                                                       vertical: 5.h,
                                                     ),
                                                     decoration: BoxDecoration(
-                                                      color: ColorPalette
-                                                          .primaryColor,
+                                                      color: productStatusColor(allproductsList[index]),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               5),
@@ -559,18 +528,19 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                            'ADD',
+                                                            productStatusLabel(allproductsList[index]),
                                                             style: fontStyle(
-                                                              12.sp,
+                                                              10.sp,
                                                               Colors.white,
                                                               FontWeight.w400,
                                                             ),
                                                           ),
-                                                          const Icon(
-                                                            Icons.add,
-                                                            color: Colors.white,
-                                                            size: 18,
-                                                          )
+                                                          if (isProductAvailable(allproductsList[index]))
+                                                            const Icon(
+                                                              Icons.add,
+                                                              color: Colors.white,
+                                                              size: 18,
+                                                            )
                                                         ],
                                                       ),
                                                     ),

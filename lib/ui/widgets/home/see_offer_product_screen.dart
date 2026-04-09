@@ -63,7 +63,7 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api//wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -96,7 +96,7 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
     setState(() {});
     try {
       final response = await http.get(Uri.parse(
-          'https://app.medonetrade.com/api//all_offered_products'));
+          'https://stage.medone.primeharvestbd.com/api/all_offered_products'));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (mounted) {
@@ -125,7 +125,7 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              'https://app.medonetrade.com/api//addToWishlist/$productId'),
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -169,7 +169,7 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api//removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -246,7 +246,7 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
 
   Future<String?> _refreshToken(String refreshToken) async {
     const String apiUrl =
-        'https://app.medonetrade.com/api//refresh';
+        'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -501,24 +501,26 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
                                                   .toString()) ==
                                               0
                                           ? InkWell(
-                                              onTap: () {
-                                                setState(() {
-                                                  productQuantities[
-                                                          offeredproductsList[
-                                                              index]['id']] =
-                                                      (productQuantities[
-                                                                  offeredproductsList[
-                                                                          index]
-                                                                      ['id']] ??
-                                                              0) +
-                                                          1;
-                                                  showQuantityButtons = true;
-                                                });
-                                                SchedulerBinding.instance
-                                                    .addPostFrameCallback((_) {
-                                                  addToCart(index);
-                                                });
-                                              },
+                                              onTap: isProductAvailable(offeredproductsList[index])
+                                                  ? () {
+                                                      setState(() {
+                                                        productQuantities[
+                                                                offeredproductsList[
+                                                                    index]['id']] =
+                                                            (productQuantities[
+                                                                        offeredproductsList[
+                                                                                index]
+                                                                            ['id']] ??
+                                                                    0) +
+                                                                1;
+                                                        showQuantityButtons = true;
+                                                      });
+                                                      SchedulerBinding.instance
+                                                          .addPostFrameCallback((_) {
+                                                        addToCart(index);
+                                                      });
+                                                    }
+                                                  : null,
                                               child: Container(
                                                 height: 28.h,
                                                 width: 80.w,
@@ -527,8 +529,7 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
                                                   vertical: 5.h,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color:
-                                                      ColorPalette.primaryColor,
+                                                  color: productStatusColor(offeredproductsList[index]),
                                                   borderRadius:
                                                       BorderRadius.circular(5),
                                                 ),
@@ -539,18 +540,19 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
                                                             .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        'ADD',
+                                                        productStatusLabel(offeredproductsList[index]),
                                                         style: fontStyle(
-                                                          12.sp,
+                                                          10.sp,
                                                           Colors.white,
                                                           FontWeight.w400,
                                                         ),
                                                       ),
-                                                      const Icon(
-                                                        Icons.add,
-                                                        color: Colors.white,
-                                                        size: 18,
-                                                      )
+                                                      if (isProductAvailable(offeredproductsList[index]))
+                                                        const Icon(
+                                                          Icons.add,
+                                                          color: Colors.white,
+                                                          size: 18,
+                                                        )
                                                     ],
                                                   ),
                                                 ),

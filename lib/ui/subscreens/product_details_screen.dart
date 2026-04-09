@@ -20,8 +20,7 @@ import 'package:http/http.dart' as http;
 
 class ProductDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> productDetails;
-  const ProductDetailsScreen({Key? key, required this.productDetails})
-      : super(key: key);
+  const ProductDetailsScreen({super.key, required this.productDetails});
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
@@ -80,7 +79,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -126,7 +125,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              'https://app.medonetrade.com/api/addToWishlist/$productId'),
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -182,7 +181,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
       final int wishlistId = _wishlistItems[wishlistIndex]['id'];
       final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -258,7 +257,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
 
     try {
       final response = await http.post(
@@ -517,21 +516,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   .toString()) ==
                               0
                           ? InkWell(
-                              onTap: () {
-                                setState(() {
-                                  productQuantities[
-                                          widget.productDetails['id']] =
-                                      (productQuantities[widget
-                                                  .productDetails['id']] ??
-                                              0) +
-                                          1;
-                                  showQuantityButtons = true;
-                                });
-                                SchedulerBinding.instance
-                                    .addPostFrameCallback((_) {
-                                  addToCart();
-                                });
-                              },
+                              onTap: isProductAvailable(widget.productDetails)
+                                  ? () {
+                                      setState(() {
+                                        productQuantities[
+                                                widget.productDetails['id']] =
+                                            (productQuantities[widget
+                                                        .productDetails['id']] ??
+                                                    0) +
+                                                1;
+                                        showQuantityButtons = true;
+                                      });
+                                      SchedulerBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        addToCart();
+                                      });
+                                    }
+                                  : null,
                               child: Container(
                                 height: 45.h,
                                 width: 280.w,
@@ -540,12 +541,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   vertical: 5.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: ColorPalette.primaryColor,
+                                  color: productStatusColor(widget.productDetails),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Add to cart',
+                                    isProductAvailable(widget.productDetails)
+                                        ? 'Add to cart'
+                                        : productStatusLabel(widget.productDetails),
                                     style: fontStyle(
                                       16.sp,
                                       Colors.white,

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:omnicare_app/util/app_constants.dart';
 
 class ProductController extends GetxController {
   final RxList<dynamic> offeredproductsList = <dynamic>[].obs;
@@ -11,6 +12,8 @@ class ProductController extends GetxController {
   final RxList<dynamic> companyList = <dynamic>[].obs;
   final RxList<dynamic> featuredCategoryList = <dynamic>[].obs;
   final RxList<bool> isFavouriteList = <bool>[].obs;
+  final RxList<dynamic> trendingProductsList = <dynamic>[].obs;
+  final RxBool trendingLoading = false.obs;
 
   final RxBool inProgress = false.obs;
 
@@ -33,7 +36,7 @@ Future<void> getCategoryWiseProducts({
   try {
     final response = await http.get(
       Uri.parse(
-        'https://app.medonetrade.com/api/category_wise_product/$categoryId',
+        AppConstants.categoryWiseProduct(categoryId),
       ),
     );
 
@@ -66,12 +69,15 @@ Future<void> getCategoryWiseProducts({
       inProgress.value = true;
       try {
         final response = await http.get(
-          Uri.parse('https://app.medonetrade.com/api'),
+          Uri.parse(AppConstants.allOfferedProducts),
         );
 
         if (response.statusCode == 200) {
           final json = jsonDecode(response.body);
-          offeredproductsList.assignAll(json['offered_products'] ?? []);
+          final list = json is List
+              ? json
+              : (json['data'] ?? json['offered_products'] ?? json['products'] ?? []);
+          offeredproductsList.assignAll(list);
           isFavouriteList.assignAll(
             List.filled(offeredproductsList.length, false),
           );
@@ -93,7 +99,7 @@ Future<void> getCategoryWiseProducts({
       inProgress.value = true;
       try {
         final response = await http.get(
-          Uri.parse('https://app.medonetrade.com/api'),
+          Uri.parse(AppConstants.home),
         );
 
         if (response.statusCode == 200) {
@@ -117,12 +123,14 @@ Future<void> getCategoryWiseProducts({
       inProgress.value = true;
       try {
         final response = await http.get(
-          Uri.parse('https://app.medonetrade.com/api'),
+          Uri.parse(AppConstants.allProducts),
         );
 
         if (response.statusCode == 200) {
           final json = jsonDecode(response.body);
-          allproductsList.assignAll(json['all_products'] ?? []);
+          final list = json['data'] ?? [];
+          allproductsList.assignAll(list);
+          print('All Products Loaded: ${allproductsList.length}');
 
           if (isFavouriteList.length != allproductsList.length) {
             isFavouriteList.assignAll(
@@ -148,7 +156,7 @@ Future<void> getFeaturedCategories() async {
     try {
       final response = await http.get(
         Uri.parse(
-          'https://app.medonetrade.com/api/featured_categories',
+          AppConstants.featuredCategories,
         ),
       );
 
@@ -173,19 +181,56 @@ Future<void> getFeaturedCategories() async {
     }
   }
 }
+  Future<void> getTrendingProducts() async {
+    trendingLoading.value = true;
+    try {
+      if (allproductsList.isEmpty) await getAllProducts();
+
+      final response = await http.get(
+        Uri.parse(AppConstants.topSales),
+      );
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final topSalesList = json['data'] ?? [];
+
+        final Map<int, dynamic> productMap = {
+          for (var p in allproductsList) (p['id'] as int): p
+        };
+
+        final enriched = <dynamic>[];
+        for (final item in topSalesList) {
+          final id = item['id'] as int?;
+          if (id != null && productMap.containsKey(id)) {
+            enriched.add(productMap[id]);
+          }
+        }
+        trendingProductsList.assignAll(enriched);
+        print('Trending Products Loaded: ${trendingProductsList.length}');
+      } else {
+        print('Failed to load trending products. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Trending Products Error: $error');
+    } finally {
+      trendingLoading.value = false;
+    }
+  }
+
   Future<void> refreshAllData() async {
     offeredproductsList.clear();
     allproductsList.clear();
     companyList.clear();
     featuredCategoryList.clear();
     isFavouriteList.clear();
+    trendingProductsList.clear();
 
     await Future.wait([
       getOfferProducts(),
       getCompany(),
-      getAllProducts(),
       getFeaturedCategories(),
     ]);
+    await getAllProducts();
+    await getTrendingProducts();
   }
 
   @override
@@ -193,7 +238,7 @@ Future<void> getFeaturedCategories() async {
     super.onInit();
     getOfferProducts();
     getCompany();
-    getAllProducts();
     getFeaturedCategories();
+    getAllProducts().then((_) => getTrendingProducts());
   }
 }

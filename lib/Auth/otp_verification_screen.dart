@@ -8,7 +8,7 @@ import 'package:omnicare_app/ui/network_checker_screen/network_checker_screen.da
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen({Key? key}) : super(key: key);
+  const OtpVerificationScreen({super.key});
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -29,7 +29,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     super.initState();
   }
 
-  startTimer() {
+  void startTimer() {
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         resendTime = resendTime - 1;
@@ -40,7 +40,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     });
   }
 
-  stopTimer() {
+  void stopTimer() {
     if (countdownTimer.isActive) {
       countdownTimer.cancel();
     }

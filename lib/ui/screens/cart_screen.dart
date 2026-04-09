@@ -14,7 +14,7 @@ import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  const CartScreen({super.key});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -240,11 +240,11 @@ class CartItemWidget extends StatelessWidget {
   final VoidCallback onProductImageTapped;
 
   const CartItemWidget({
-    Key? key,
+    super.key,
     required this.cartItem,
     required this.onQuantityChanged,
     required this.onProductImageTapped,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

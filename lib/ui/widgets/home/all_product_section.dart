@@ -61,7 +61,7 @@ class _AllProductSectionState extends State<AllProductSection> {
         return;
       }
       final response = await http.get(
-        Uri.parse('https://app.medonetrade.com/api/wishlist'),
+        Uri.parse('https://stage.medone.primeharvestbd.com/api/wishlist'),
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
@@ -98,7 +98,7 @@ class _AllProductSectionState extends State<AllProductSection> {
       try {
         final response = await http.get(
           Uri.parse(
-              'https://app.medonetrade.com/api/addToWishlist/$productId'),
+              'https://stage.medone.primeharvestbd.com/api/addToWishlist/$productId'),
           headers: {'Authorization': 'Bearer $accessToken'},
         );
         if (response.statusCode == 200) {
@@ -142,7 +142,7 @@ class _AllProductSectionState extends State<AllProductSection> {
         return;
       }
       final Uri url = Uri.parse(
-          'https://app.medonetrade.com/api/removeFromWishlist/$wishlistId');
+          'https://stage.medone.primeharvestbd.com/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -218,7 +218,7 @@ class _AllProductSectionState extends State<AllProductSection> {
   }
 
   Future<String?> _refreshToken(String refreshToken) async {
-    const String apiUrl = 'https://app.medonetrade.com/api/refresh';
+    const String apiUrl = 'https://stage.medone.primeharvestbd.com/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -518,32 +518,32 @@ class _AllProductSectionState extends State<AllProductSection> {
                                           // Display either the "ADD" button or quantity control buttons
                                           int.parse(cartProviders
                                                       .getProductQuantityById(
-                                                          controller
-                                                                  .allproductsList[
-                                                              index]['id'])
+                                                          controller.allproductsList[index]['id'])
                                                       .toString()) ==
                                                   0
                                               ? InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      productQuantities[controller
-                                                                  .allproductsList[
-                                                              index][
-                                                          'id']] = (productQuantities[
-                                                                  controller.allproductsList[
-                                                                          index]
-                                                                      ['id']] ??
-                                                              0) +
-                                                          1;
-                                                      showQuantityButtons =
-                                                          true;
-                                                    });
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback(
-                                                            (_) {
-                                                      addToCart(index);
-                                                    });
-                                                  },
+                                                  onTap: isProductAvailable(controller.allproductsList[index])
+                                                      ? () {
+                                                          setState(() {
+                                                            productQuantities[controller
+                                                                        .allproductsList[
+                                                                    index]
+                                                                    ['id']] = (productQuantities[
+                                                                        controller.allproductsList[
+                                                                                index]
+                                                                            ['id']] ??
+                                                                    0) +
+                                                                1;
+                                                            showQuantityButtons =
+                                                                true;
+                                                          });
+                                                          SchedulerBinding.instance
+                                                              .addPostFrameCallback(
+                                                                  (_) {
+                                                            addToCart(index);
+                                                          });
+                                                        }
+                                                      : null,
                                                   child: Container(
                                                     height: 28.h,
                                                     width: 80.w,
@@ -553,8 +553,7 @@ class _AllProductSectionState extends State<AllProductSection> {
                                                       vertical: 5.h,
                                                     ),
                                                     decoration: BoxDecoration(
-                                                      color: ColorPalette
-                                                          .primaryColor,
+                                                      color: productStatusColor(controller.allproductsList[index]),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               5),
@@ -566,18 +565,19 @@ class _AllProductSectionState extends State<AllProductSection> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                            'ADD',
+                                                            productStatusLabel(controller.allproductsList[index]),
                                                             style: fontStyle(
-                                                              12.sp,
+                                                              10.sp,
                                                               Colors.white,
                                                               FontWeight.w400,
                                                             ),
                                                           ),
-                                                          const Icon(
-                                                            Icons.add,
-                                                            color: Colors.white,
-                                                            size: 18,
-                                                          )
+                                                          if (isProductAvailable(controller.allproductsList[index]))
+                                                            const Icon(
+                                                              Icons.add,
+                                                              color: Colors.white,
+                                                              size: 18,
+                                                            )
                                                         ],
                                                       ),
                                                     ),
