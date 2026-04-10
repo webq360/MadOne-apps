@@ -155,19 +155,30 @@ Future<void> getCategoryWiseProducts({
   Future<void> refreshAllData() async {
     inProgress.value = true;
     trendingLoading.value = true;
-    await Future.wait([
-      getOfferProducts(),
-      getCompany(),
-      getFeaturedCategories(),
-      getAllProducts(),
-    ]);
-    await getTrendingProducts();
-    inProgress.value = false;
+    try {
+      await Future.wait([
+        getOfferProducts(),
+        getCompany(),
+        getFeaturedCategories(),
+        getAllProducts(),
+      ]);
+      await getTrendingProducts();
+    } catch (error, stackTrace) {
+      print('Error in refreshAllData: $error');
+      print('Stack trace: $stackTrace');
+    } finally {
+      inProgress.value = false;
+    }
   }
 
   @override
   void onInit() {
     super.onInit();
-    refreshAllData();
+    try {
+      refreshAllData();
+    } catch (error, stackTrace) {
+      print('ProductController Init Error: $error');
+      print('Stack trace: $stackTrace');
+    }
   }
 }

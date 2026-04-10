@@ -13,29 +13,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase first
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    // Initialize Firebase first
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Register background message handler BEFORE any other Firebase calls
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    // Register background message handler BEFORE any other Firebase calls
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  // Get the application documents directory path
-  final appDocumentDirectory = await getApplicationDocumentsDirectory();
-  await FirebaseNotificationService().init();
-  // Initialize Hive with the application documents directory path
-  Hive.init(appDocumentDirectory.path);
-  // Register TypeAdapters
-  Hive.registerAdapter(HiveSliderAdapter());
-  Hive.registerAdapter(HiveBannerAdapter());
-  Hive.registerAdapter(CompanyAdapter());
+    // Get the application documents directory path
+    final appDocumentDirectory = await getApplicationDocumentsDirectory();
+    await FirebaseNotificationService().init();
+    // Initialize Hive with the application documents directory path
+    Hive.init(appDocumentDirectory.path);
+    // Register TypeAdapters
+    Hive.registerAdapter(HiveSliderAdapter());
+    Hive.registerAdapter(HiveBannerAdapter());
+    Hive.registerAdapter(CompanyAdapter());
 
-  // Open Hive boxes and SharedPreferences
-  await Future.wait([
-    Hive.openBox<HiveSlider>('sliders'),
-    Hive.openBox<HiveBanner>('banners'),
-    Hive.openBox<HiveBanner>('companyBox'),
-    SharedPreferences.getInstance(),
-  ]);
+    // Open Hive boxes and SharedPreferences
+    await Future.wait([
+      Hive.openBox<HiveSlider>('sliders'),
+      Hive.openBox<HiveBanner>('banners'),
+      Hive.openBox<HiveBanner>('companyBox'),
+      SharedPreferences.getInstance(),
+    ]);
+  } catch (error, stackTrace) {
+    print('Error during initialization: $error');
+    print('Stack trace: $stackTrace');
+  }
 
   runApp(const OmniCare());
 }

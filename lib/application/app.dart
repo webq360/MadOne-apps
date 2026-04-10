@@ -18,7 +18,7 @@ class OmniCare extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CompanyController companyController = Get.put(CompanyController());
-    return  ScreenUtilInit(
+    return ScreenUtilInit(
       builder: (context, child) => MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => CartProvider()),
@@ -38,6 +38,28 @@ class OmniCare extends StatelessWidget {
             ),
           ),
           home: const SplashScreen(),
+          builder: (context, widget) {
+            ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+              return Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Error occurred', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 20),
+                      Text(errorDetails.exceptionAsString()),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => Get.offAll(() => const SplashScreen()),
+                        child: const Text('Restart App'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            };
+            return widget!;
+          },
         ),
       ),
       designSize: const Size(360, 800),

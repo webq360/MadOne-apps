@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, prefer_const_constructors, prefer_const_literals_to_create_immutables, override_on_non_overriding_member
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!homeController.isDataLoaded.value) {
       loadData();
     }
-    Get.find<ProductController>().refreshAllData();
+    // only fetch if not already loaded
+    final pc = Get.find<ProductController>();
+    if (pc.allproductsList.isEmpty) {
+      pc.refreshAllData();
+    }
   }
 
   void loadData() async {
@@ -78,7 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
           if (!homeController.isDataLoaded.value) {
             return Center(child: Text(''));
           } else {
-            return SingleChildScrollView(
+            return RefreshIndicator(
+              onRefresh: () => Get.find<ProductController>().refreshAllData(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
                   if (homeController.sliderList.isNotEmpty)
@@ -97,10 +105,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ],
                               ),
-                              child: Image.network(
-                                slider.imageUrl,
+                              child: CachedNetworkImage(
+                                imageUrl: slider.imageUrl,
                                 fit: BoxFit.fill,
                                 width: double.infinity,
+                                fadeInDuration: Duration.zero,
+                                fadeOutDuration: Duration.zero,
+                                placeholder: (context, url) => const SizedBox(),
+                                errorWidget: (context, url, error) => const SizedBox(),
                               ),
                             );
                           }).toList(),
@@ -191,10 +203,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         //const OfferedProductSection(),
                         SizedBox(height: 20.h),
                         if (homeController.bannerList.isNotEmpty)
-                          Image.network(
-                            homeController.bannerList[0].imageUrl,
+                          CachedNetworkImage(
+                            imageUrl: homeController.bannerList[0].imageUrl,
                             fit: BoxFit.cover,
                             width: double.infinity,
+                            fadeInDuration: Duration.zero,
+                            fadeOutDuration: Duration.zero,
+                            placeholder: (context, url) => const SizedBox(),
+                            errorWidget: (context, url, error) => const SizedBox(),
                           ),
                         SizedBox(height: 20.h),
                         const OfferProductSection(),
@@ -205,12 +221,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            );
+            ),
+          );
           }
         }
       }),
     );
   }
-
-
 }

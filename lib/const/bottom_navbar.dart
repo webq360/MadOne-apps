@@ -107,9 +107,6 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
           unselectedItemColor: Colors.black,
           currentIndex: currentIndex,
           onTap: (index) {
-            if (index == 0 && currentIndex == 0) {
-              Get.find<ProductController>().refreshAllData();
-            }
             setState(() {
               currentIndex = index;
             });

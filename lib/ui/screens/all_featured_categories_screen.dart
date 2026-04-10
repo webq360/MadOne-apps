@@ -42,7 +42,7 @@ class AllFeaturedCategoriesScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final category = controller.featuredCategoryList[index];
             final String name = category['category_name']?.toString() ?? '';
-            final String imageUrl = _buildImageUrl(category['category_image']?.toString());
+            final String imageUrl = _buildImageUrl(category['image']?.toString() ?? category['category_image']?.toString());
             final int categoryId = category['id'] ?? 0;
 
             return InkWell(
