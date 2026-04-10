@@ -221,21 +221,26 @@ class _SeeTrendingProductScreenState extends State<SeeTrendingProductScreen> {
                                             : null,
                                         child: Container(
                                           height: 28.h,
-                                          width: 80.w,
-                                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                                          width: double.infinity,
+                                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 5.h),
                                           decoration: BoxDecoration(
                                             color: productStatusColor(product),
                                             borderRadius: BorderRadius.circular(5),
                                           ),
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Text(
-                                                productStatusLabel(product),
-                                                style: fontStyle(10.sp, Colors.white, FontWeight.w400),
+                                              Flexible(
+                                                child: Text(
+                                                  productStatusLabel(product),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: fontStyle(10.sp, Colors.white, FontWeight.w400),
+                                                ),
                                               ),
-                                              if (isProductAvailable(product))
-                                                const Icon(Icons.add, color: Colors.white, size: 18),
+                                              if (isProductAvailable(product)) ...[                                                
+                                                SizedBox(width: 4.w),
+                                                const Icon(Icons.add, color: Colors.white, size: 16),
+                                              ],
                                             ],
                                           ),
                                         ),

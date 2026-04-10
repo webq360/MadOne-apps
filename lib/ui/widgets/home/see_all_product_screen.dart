@@ -509,40 +509,30 @@ class _SeeAllProductScreenState extends State<SeeAllProductScreen> {
                                                       : null,
                                                   child: Container(
                                                     height: 28.h,
-                                                    width: 80.w,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal: 10.w,
+                                                    width: double.infinity,
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: 6.w,
                                                       vertical: 5.h,
                                                     ),
                                                     decoration: BoxDecoration(
                                                       color: productStatusColor(allproductsList[index]),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
+                                                      borderRadius: BorderRadius.circular(5),
                                                     ),
-                                                    child: Center(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Flexible(
+                                                          child: Text(
                                                             productStatusLabel(allproductsList[index]),
-                                                            style: fontStyle(
-                                                              10.sp,
-                                                              Colors.white,
-                                                              FontWeight.w400,
-                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: fontStyle(10.sp, Colors.white, FontWeight.w400),
                                                           ),
-                                                          if (isProductAvailable(allproductsList[index]))
-                                                            const Icon(
-                                                              Icons.add,
-                                                              color: Colors.white,
-                                                              size: 18,
-                                                            )
+                                                        ),
+                                                        if (isProductAvailable(allproductsList[index])) ...[                                                          
+                                                          SizedBox(width: 4.w),
+                                                          const Icon(Icons.add, color: Colors.white, size: 16),
                                                         ],
-                                                      ),
+                                                      ],
                                                     ),
                                                   ),
                                                 )

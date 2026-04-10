@@ -99,13 +99,18 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
           'https://app.medonetrade.com/api/all_offered_products'));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
+        final raw = (json is List ? json : (json['data'] ?? json)) as List;
+        final list = raw
+            .where((p) =>
+                p['is_banned'] != 1 && p['is_hide'] != 1 &&
+                p['banned'] != 1 && p['hide'] != 1)
+            .toList();
         if (mounted) {
           setState(() {
-            offeredproductsList = json;
+            offeredproductsList = list;
             isFavouriteList = List.filled(offeredproductsList.length, false);
           });
         }
-        print(offeredproductsList);
       } else {
         print(
             'Failed to load company names. Status code: ${response.statusCode}');
@@ -523,38 +528,30 @@ class _SeeOfferedProductScreenState extends State<SeeOfferedProductScreen> {
                                                   : null,
                                               child: Container(
                                                 height: 28.h,
-                                                width: 80.w,
+                                                width: double.infinity,
                                                 padding: EdgeInsets.symmetric(
-                                                  horizontal: 10.w,
+                                                  horizontal: 6.w,
                                                   vertical: 5.h,
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: productStatusColor(offeredproductsList[index]),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
+                                                  borderRadius: BorderRadius.circular(5),
                                                 ),
-                                                child: Center(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
                                                         productStatusLabel(offeredproductsList[index]),
-                                                        style: fontStyle(
-                                                          10.sp,
-                                                          Colors.white,
-                                                          FontWeight.w400,
-                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: fontStyle(10.sp, Colors.white, FontWeight.w400),
                                                       ),
-                                                      if (isProductAvailable(offeredproductsList[index]))
-                                                        const Icon(
-                                                          Icons.add,
-                                                          color: Colors.white,
-                                                          size: 18,
-                                                        )
+                                                    ),
+                                                    if (isProductAvailable(offeredproductsList[index])) ...[                                                      
+                                                      SizedBox(width: 4.w),
+                                                      const Icon(Icons.add, color: Colors.white, size: 16),
                                                     ],
-                                                  ),
+                                                  ],
                                                 ),
                                               ),
                                             )

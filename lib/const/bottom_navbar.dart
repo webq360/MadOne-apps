@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:omnicare_app/const/custom_widgets.dart';
 import 'package:omnicare_app/services/cart_provider.dart';
@@ -13,6 +14,7 @@ import 'package:omnicare_app/ui/screens/account_screen.dart';
 import 'package:omnicare_app/ui/screens/cart_screen.dart';
 import 'package:omnicare_app/ui/screens/company_screen.dart';
 import 'package:omnicare_app/ui/screens/home_screen.dart';
+import 'package:omnicare_app/controller/product_controller.dart';
 import 'package:omnicare_app/ui/screens/orderlist_screen.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
@@ -105,6 +107,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
           unselectedItemColor: Colors.black,
           currentIndex: currentIndex,
           onTap: (index) {
+            if (index == 0 && currentIndex == 0) {
+              Get.find<ProductController>().refreshAllData();
+            }
             setState(() {
               currentIndex = index;
             });

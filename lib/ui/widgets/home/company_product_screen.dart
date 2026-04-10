@@ -698,35 +698,30 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                               },
                               child: Container(
                                 height: 28.h,
-                                width: 80.w,
+                                width: double.infinity,
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
+                                  horizontal: 6.w,
                                   vertical: 5.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: ColorPalette.primaryColor,
+                                  color: productStatusColor(product),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'ADD',
-                                        style: fontStyle(
-                                          12.sp,
-                                          Colors.white,
-                                          FontWeight.w400,
-                                        ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        productStatusLabel(product),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: fontStyle(10.sp, Colors.white, FontWeight.w400),
                                       ),
-                                      const Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                        size: 18,
-                                      )
+                                    ),
+                                    if (isProductAvailable(product)) ...[                                      
+                                      SizedBox(width: 4.w),
+                                      const Icon(Icons.add, color: Colors.white, size: 16),
                                     ],
-                                  ),
+                                  ],
                                 ),
                               ),
                             )

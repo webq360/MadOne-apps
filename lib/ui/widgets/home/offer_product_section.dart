@@ -314,49 +314,32 @@ class _OfferProductSectionState extends State<OfferProductSection> {
 
   @override
   Widget build(BuildContext context) {
-    var cartProviders = Provider.of<CartProvider>(context, listen: false);
-
     cartItems = Provider.of<CartProvider>(context).cartItems;
     final favoriteProvider = Provider.of<FavoriteProvider>(context);
     return ChangeNotifierProvider(
-      create: (context) {
-        return QuantityButtonsProvider();
-      },
+      create: (context) => QuantityButtonsProvider(),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Offer Product",
-                style: fontStyle(12.sp, Colors.black, FontWeight.w400),
-              ),
+              Text("Offer Product", style: fontStyle(12.sp, Colors.black, FontWeight.w400)),
               TextButton(
-                onPressed: () {
-                  setState(() {
-                    Get.to(() => const SeeOfferedProductScreen());
-                  });
-                },
-                child: Text(
-                  "See all",
-                  style: fontStyle(12.sp, Colors.black, FontWeight.w400),
-                ),
+                onPressed: () { setState(() { Get.to(() => const SeeOfferedProductScreen()); }); },
+                child: Text("See all", style: fontStyle(12.sp, Colors.black, FontWeight.w400)),
               )
             ],
           ),
-          Obx(() => controller.inProgress.value
-              ? SizedBox(
-                  height: 160,
-                  child: Center(
-                    child: LoadingAnimationWidget.staggeredDotsWave(
-                      size: 40,
-                      color: ColorPalette.primaryColor,
-                    ),
-                  ),
-                )
-              : controller.offeredproductsList.isEmpty
-                  ? const SizedBox()
-                  : Padding(
+          Obx(() {
+            final cartProviders = Provider.of<CartProvider>(context, listen: false);
+            if (controller.inProgress.value) {
+              return SizedBox(
+                height: 160,
+                child: Center(child: LoadingAnimationWidget.staggeredDotsWave(size: 40, color: ColorPalette.primaryColor)),
+              );
+            }
+            if (controller.offeredproductsList.isEmpty) return const SizedBox();
+            return Padding(
                   padding: EdgeInsets.symmetric(vertical: 5.h),
                   child: GridView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -485,7 +468,7 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                   Text(
                                                     ' ${controller.offeredproductsList[index]['discount_type']}',
                                                     style: fontStyle(
-                                                        11.sp,
+                                                        6.sp,
                                                         Colors.green,
                                                         FontWeight.w600),
                                                   ),
@@ -526,9 +509,9 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                     : null,
                                                 child: Container(
                                                   height: 28.h,
-                                                  width: 80.w,
+                                                  width: double.infinity,
                                                   padding: EdgeInsets.symmetric(
-                                                    horizontal: 10.w,
+                                                    horizontal: 6.w,
                                                     vertical: 5.h,
                                                   ),
                                                   decoration: BoxDecoration(
@@ -536,28 +519,25 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                                                     borderRadius:
                                                         BorderRadius.circular(5),
                                                   ),
-                                                  child: Center(
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Flexible(
+                                                        child: Text(
                                                           productStatusLabel(controller.offeredproductsList[index]),
+                                                          overflow: TextOverflow.ellipsis,
                                                           style: fontStyle(
                                                             10.sp,
                                                             Colors.white,
                                                             FontWeight.w400,
                                                           ),
                                                         ),
-                                                        if (isProductAvailable(controller.offeredproductsList[index]))
-                                                          const Icon(
-                                                            Icons.add,
-                                                            color: Colors.white,
-                                                            size: 18,
-                                                          )
+                                                      ),
+                                                      if (isProductAvailable(controller.offeredproductsList[index])) ...[                                                        
+                                                        SizedBox(width: 4.w),
+                                                        const Icon(Icons.add, color: Colors.white, size: 16),
                                                       ],
-                                                    ),
+                                                    ],
                                                   ),
                                                 ),
                                               )
@@ -672,8 +652,8 @@ class _OfferProductSectionState extends State<OfferProductSection> {
                       );
                     },
                   ),
-                ),
-          ),
+            );
+          }),
           SizedBox(height: 10.h),
           InkWell(
             onTap: () {

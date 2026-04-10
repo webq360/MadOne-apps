@@ -357,7 +357,7 @@ class _AllProductSectionState extends State<AllProductSection> {
               )
             ],
           ),
-          controller.inProgress.value
+          Obx(() => controller.inProgress.value
               ? SizedBox(
                   height: 160,
                   child: Center(
@@ -460,12 +460,14 @@ class _AllProductSectionState extends State<AllProductSection> {
                                             style: fontStyle(12.sp,
                                                 Colors.black, FontWeight.w600),
                                           ),
-                                          Row(
+                                          Wrap(
+                                            spacing: 4,
+                                            runSpacing: 0,
                                             children: [
                                               Text(
                                                 '৳${controller.allproductsList[index]['sell_price']}',
                                                 style: const TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: 11,
                                                   color: Colors.grey,
                                                   fontWeight: FontWeight.w400,
                                                   decoration: TextDecoration.lineThrough,
@@ -473,18 +475,9 @@ class _AllProductSectionState extends State<AllProductSection> {
                                                   decorationThickness: 3,
                                                 ),
                                               ),
-                                              SizedBox(width: 9.w),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    '৳${double.tryParse('${controller.allproductsList[index]['discount']}'.replaceAll(',', ''))?.toStringAsFixed(2) ?? '0.00'}',
-                                                    style: fontStyle(12, Colors.green, FontWeight.w600),
-                                                  ),
-                                                  if (controller.allproductsList[index]['discount_type']?.toLowerCase() == 'percent')
-                                                    Text('% Off', style: fontStyle(12, Colors.green, FontWeight.w600)),
-                                                  if (controller.allproductsList[index]['discount_type']?.toLowerCase() != 'percent')
-                                                    Text(' ${controller.allproductsList[index]['discount_type']}', style: fontStyle(11, Colors.green, FontWeight.w600)),
-                                                ],
+                                              Text(
+                                                '৳${double.tryParse('${controller.allproductsList[index]['discount']}'.replaceAll(',', ''))?.toStringAsFixed(2) ?? '0.00'}${controller.allproductsList[index]['discount_type']?.toLowerCase() == 'percent' ? '% Off' : ' ${controller.allproductsList[index]['discount_type']}'}',
+                                                style: fontStyle(11, Colors.green, FontWeight.w600),
                                               ),
                                             ],
                                           ),
@@ -502,18 +495,26 @@ class _AllProductSectionState extends State<AllProductSection> {
                                                       : null,
                                                   child: Container(
                                                     height: 28.h,
-                                                    width: 80.w,
-                                                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                                                    width: double.infinity,
+                                                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 5.h),
                                                     decoration: BoxDecoration(
                                                       color: productStatusColor(controller.allproductsList[index]),
                                                       borderRadius: BorderRadius.circular(5),
                                                     ),
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
-                                                        Text(productStatusLabel(controller.allproductsList[index]), style: fontStyle(10.sp, Colors.white, FontWeight.w400)),
-                                                        if (isProductAvailable(controller.allproductsList[index]))
-                                                          const Icon(Icons.add, color: Colors.white, size: 18),
+                                                        Flexible(
+                                                          child: Text(
+                                                            productStatusLabel(controller.allproductsList[index]),
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: fontStyle(10.sp, Colors.white, FontWeight.w400),
+                                                          ),
+                                                        ),
+                                                        if (isProductAvailable(controller.allproductsList[index])) ...[                                                          
+                                                          SizedBox(width: 4.w),
+                                                          const Icon(Icons.add, color: Colors.white, size: 16),
+                                                        ],
                                                       ],
                                                     ),
                                                   ),
@@ -594,7 +595,8 @@ class _AllProductSectionState extends State<AllProductSection> {
                       },
                     ),
                   ),
-                )
+                ),
+              )
         ],
       ),
     );

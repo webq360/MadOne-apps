@@ -233,39 +233,25 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                       style: fontStyle(12.sp, Colors.black,
                                           FontWeight.w600),
                                     ),
-                                    Row(
+                                    Wrap(
+                                      spacing: 4,
+                                      runSpacing: 0,
                                       children: [
                                         Text(
                                           '৳${product['sell_price']}',
                                           style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 11,
                                             color: Colors.grey,
                                             fontWeight: FontWeight.w400,
-                                            decoration:
-                                                TextDecoration.lineThrough,
+                                            decoration: TextDecoration.lineThrough,
                                             decorationColor: Colors.red,
                                             decorationThickness: 3,
                                           ),
                                         ),
-                                        SizedBox(width: 9.w),
                                         Text(
-                                          '৳${double.tryParse('${product['discount']}')?.toStringAsFixed(2) ?? '0.00'}',
-                                          style: fontStyle(12, Colors.green,
-                                              FontWeight.w600),
+                                          '৳${double.tryParse('${product['discount']}')?.toStringAsFixed(2) ?? '0.00'}${'${product['discount_type']}'.toLowerCase() == 'percent' ? '% Off' : ' ${product['discount_type']}'}',
+                                          style: fontStyle(11, Colors.green, FontWeight.w600),
                                         ),
-                                        if ('${product['discount_type']}'
-                                                .toLowerCase() ==
-                                            'percent')
-                                          Text('% Off',
-                                              style: fontStyle(12,
-                                                  Colors.green,
-                                                  FontWeight.w600))
-                                        else
-                                          Text(
-                                              ' ${product['discount_type']}',
-                                              style: fontStyle(11,
-                                                  Colors.green,
-                                                  FontWeight.w600)),
                                       ],
                                     ),
                                     cartProvider.getProductQuantityById(
@@ -291,33 +277,28 @@ class _TrendingProductSectionState extends State<TrendingProductSection> {
                                                 : null,
                                             child: Container(
                                               height: 28.h,
-                                              width: 80.w,
+                                              width: double.infinity,
                                               padding: EdgeInsets.symmetric(
-                                                  horizontal: 10.w,
+                                                  horizontal: 6.w,
                                                   vertical: 5.h),
                                               decoration: BoxDecoration(
-                                                color: productStatusColor(
-                                                    product),
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
+                                                color: productStatusColor(product),
+                                                borderRadius: BorderRadius.circular(5),
                                               ),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  Text(
-                                                      productStatusLabel(
-                                                          product),
-                                                      style: fontStyle(
-                                                          10.sp,
-                                                          Colors.white,
-                                                          FontWeight.w400)),
-                                                  if (isProductAvailable(
-                                                      product))
-                                                    const Icon(Icons.add,
-                                                        color: Colors.white,
-                                                        size: 18),
+                                                  Flexible(
+                                                    child: Text(
+                                                      productStatusLabel(product),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: fontStyle(10.sp, Colors.white, FontWeight.w400),
+                                                    ),
+                                                  ),
+                                                  if (isProductAvailable(product)) ...[                                                    
+                                                    SizedBox(width: 4.w),
+                                                    const Icon(Icons.add, color: Colors.white, size: 16),
+                                                  ],
                                                 ],
                                               ),
                                             ),

@@ -38,4 +38,7 @@ class AppConstants {
   // Account
   static const String profile = '$baseUrl/profile';
   static const String updateProfile = '$baseUrl/update_profile';
+
+  // Product
+  static String productDetails(int id) => '$baseUrl/product/$id/edit';
 }

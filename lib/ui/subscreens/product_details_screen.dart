@@ -18,6 +18,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:omnicare_app/util/app_constants.dart';
+
 class ProductDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> productDetails;
   const ProductDetailsScreen({super.key, required this.productDetails});
@@ -32,36 +34,52 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int quantity = 0;
   Map<int, int> productQuantities = {};
   List<Map<String, dynamic>> _wishlistItems = [];
+  late Map<String, dynamic> _product;
 
   double extractSellingPrice() {
-    final dynamic sellingPrice = widget.productDetails['sell_price'];
+    final dynamic sellingPrice = _product['sell_price'];
     if (sellingPrice is num || sellingPrice is String) {
-      return double.tryParse(sellingPrice.toString().replaceAll(',', '')) ??
-          0.0;
-    } else {
-      return 0.0;
+      return double.tryParse(sellingPrice.toString().replaceAll(',', '')) ?? 0.0;
     }
+    return 0.0;
   }
 
   double extractAfterDiscountPrice() {
-    final dynamic afterDiscountPrice =
-        widget.productDetails['after_discount_price'];
+    final dynamic afterDiscountPrice = _product['after_discount_price'];
     if (afterDiscountPrice is num || afterDiscountPrice is String) {
-      return double.tryParse(
-              afterDiscountPrice.toString().replaceAll(',', '')) ??
-          0.0;
-    } else {
-      return 0.0;
+      return double.tryParse(afterDiscountPrice.toString().replaceAll(',', '')) ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  Future<void> _fetchFreshProduct() async {
+    try {
+      final id = widget.productDetails['id'];
+      final response = await http.get(Uri.parse(AppConstants.productDetails(id)));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final fresh = data['data'] ?? data['product'] ?? data;
+        if (fresh is Map && mounted) {
+          setState(() {
+            _product = {
+              ..._product,
+              ...Map<String, dynamic>.from(fresh),
+            };
+          });
+        }
+      }
+    } catch (e) {
+      print('Fresh product fetch error: $e');
     }
   }
 
   @override
   void initState() {
     super.initState();
+    _product = Map<String, dynamic>.from(widget.productDetails);
+    _fetchFreshProduct();
     _checkNetworkAndLoggedIn();
-    // Load favorite status from SharedPreferences when the widget initializes
     loadFavoriteStatus();
-    //fetchWishlist();
   }
 
   @override
@@ -224,10 +242,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final int productId = widget.productDetails['id'];
     final bool? isFavorite = prefs.getBool('isFavorite_$productId');
-    if (isFavorite != null) {
-      setState(() {
-        isFavourite = isFavorite;
-      });
+    if (isFavorite != null && mounted) {
+      setState(() => isFavourite = isFavorite);
     }
   }
 
@@ -293,7 +309,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   void addToCart() {
     var cartProvider = Provider.of<CartProvider>(context, listen: false);
     var existingItem = cartItems.firstWhere(
-      (item) => item.name == widget.productDetails['name'],
+      (item) => item.name == _product['name'],
       orElse: () => CartItem(
         id: 0,
         image: 'default_image_path',
@@ -309,16 +325,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       cartProvider.updateCartItemQuantity(existingItem, existingItem.quantity);
       context.read<QuantityButtonsProvider>().setShowQuantityButtons(true);
     } else {
-      var productId = widget.productDetails['id'] as int;
+      var productId = _product['id'] as int;
       var item = CartItem(
         id: productId,
-        image: widget.productDetails['image'] ?? 'default_image_path',
-        name: widget.productDetails['name'] ?? 'Unknown Product',
+        image: _product['image'] ?? 'default_image_path',
+        name: _product['name'] ?? 'Unknown Product',
         sell_price: extractSellingPrice(),
         after_discount_price: extractAfterDiscountPrice(),
-        company_name:
-            widget.productDetails['brand']['brand_name'] ?? 'Unknown Company',
-        subtitle: widget.productDetails['subtitle'] ?? 'Unknown',
+        company_name: _product['brand']['brand_name'] ?? 'Unknown Company',
+        subtitle: _product['subtitle'] ?? 'Unknown',
         quantity: 1,
         addedFromProductDetails: true,
       );
@@ -349,7 +364,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     double after_discount_price = extractAfterDiscountPrice();
     var favoriteProvider = Provider.of<FavoriteProvider>(context);
     bool isFavorite =
-        favoriteProvider.isFavorite(widget.productDetails['id']) || isFavourite;
+        favoriteProvider.isFavorite(_product['id']) || isFavourite;
     var cartProviders = Provider.of<CartProvider>(context, listen: false);
     return SafeArea(
       child: Scaffold(
@@ -383,11 +398,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       children: [
                         Center(
                           child: Image.network(
-                            widget.productDetails['image'] ??
-                                '', // Use an empty string if image URL is null
+                            _product['image'] ?? '',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              // Return a fallback image when an error occurs
                               return Image.asset(
                                 ImageAssets.productJPG,
                                 fit: BoxFit.cover,
@@ -398,8 +411,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         Positioned(
                           top: 10.h,
                           right: 10.w,
-                          child: // Inside the build method of ProductDetailsScreen
-                              Consumer<FavoriteProvider>(
+                          child: Consumer<FavoriteProvider>(
                             builder: (context, favoriteProvider, _) {
                               return IconButton(
                                 icon: Icon(
@@ -407,21 +419,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       ? Icons.favorite
                                       : Icons.favorite_border,
                                   color: isFavorite ? Colors.red : null,
-                                  // favoriteProvider.isFavorite(widget.productDetails['id']) ? Icons.favorite : Icons.favorite_border,
-                                  // color: favoriteProvider.isFavorite(widget.productDetails['id']) ? Colors.red : null,
                                 ),
                                 onPressed: () async {
-                                  // String productId = widget.productDetails['id'].toString(); // Convert to string
-                                  //  if (favoriteProvider.isFavorite(int.parse(productId))) {
-                                  String productId =
-                                      widget.productDetails['id'].toString();
+                                  String productId = _product['id'].toString();
                                   if (isFavorite) {
-                                    // Remove from wishlist if already favorited
                                     await removeFromWishlist(productId);
                                   } else {
-                                    // Add to wishlist if not already favorited
-                                    await addToWishlist(
-                                        int.parse(productId), context);
+                                    await addToWishlist(int.parse(productId), context);
                                   }
                                   setState(() {
                                     isFavorite = !isFavorite;
@@ -442,7 +446,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.productDetails['name'] ?? 'Unknown Product',
+                            _product['name'] ?? 'Unknown Product',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
@@ -450,19 +454,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ),
                           SizedBox(height: 10.h),
-                          // Text(
-                          //   widget.productDetails['brand'] != null && widget.productDetails['brand']['brand_name'] != null
-                          //       ? widget.productDetails['brand']['brand_name'] : 'Unknown company',
-                          //   style: const TextStyle(fontSize: 12, color: Color(0xff555555), fontWeight: FontWeight.w400,),
-                          // ),
                           Text(
-                            (widget.productDetails['brand'] != null &&
-                                    widget.productDetails['brand']
-                                            ['brand_name'] !=
-                                        null)
-                                ? widget.productDetails['brand']['brand_name']
-                                : (widget.productDetails['company_name'] ??
-                                    'Unknown company'),
+                            (_product['brand'] != null &&
+                                    _product['brand']['brand_name'] != null)
+                                ? _product['brand']['brand_name']
+                                : (_product['company_name'] ?? 'Unknown company'),
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xff555555),
@@ -509,22 +505,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   SizedBox(height: 20.h),
                   Row(
                     children: [
-                      // Display either the "ADD" button or quantity control buttons
                       int.parse(cartProviders
-                                  .getProductQuantityById(
-                                      widget.productDetails['id'])
+                                  .getProductQuantityById(_product['id'])
                                   .toString()) ==
                               0
                           ? InkWell(
-                              onTap: isProductAvailable(widget.productDetails)
+                              onTap: isProductAvailable(_product)
                                   ? () {
                                       setState(() {
-                                        productQuantities[
-                                                widget.productDetails['id']] =
-                                            (productQuantities[widget
-                                                        .productDetails['id']] ??
-                                                    0) +
-                                                1;
+                                        productQuantities[_product['id']] =
+                                            (productQuantities[_product['id']] ?? 0) + 1;
                                         showQuantityButtons = true;
                                       });
                                       SchedulerBinding.instance
@@ -541,19 +531,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   vertical: 5.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: productStatusColor(widget.productDetails),
+                                  color: productStatusColor(_product),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Center(
                                   child: Text(
-                                    isProductAvailable(widget.productDetails)
+                                    isProductAvailable(_product)
                                         ? 'Add to cart'
-                                        : productStatusLabel(widget.productDetails),
-                                    style: fontStyle(
-                                      16.sp,
-                                      Colors.white,
-                                      FontWeight.w400,
-                                    ),
+                                        : productStatusLabel(_product),
+                                    style: fontStyle(16.sp, Colors.white, FontWeight.w400),
                                   ),
                                 ),
                               ),
@@ -572,79 +558,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ///decrement cart quantity
                                   InkWell(
                                     onTap: () {
                                       setState(() {
-                                        var quantity = cartProviders
-                                            .getProductQuantityById(
-                                          widget.productDetails['id'],
-                                        );
-                                        quantity--;
-
-                                        cartProviders.updateQuantityById(
-                                          widget.productDetails['id'],
-                                          quantity,
-                                        );
+                                        var qty = cartProviders.getProductQuantityById(_product['id']);
+                                        cartProviders.updateQuantityById(_product['id'], qty - 1);
                                       });
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.all(2),
                                       decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.white, width: 2),
+                                        border: Border.all(color: Colors.white, width: 2),
                                         borderRadius: BorderRadius.circular(30),
                                         color: ColorPalette.primaryColor,
                                       ),
-                                      child: const Icon(
-                                        Icons.remove,
-                                        color: Colors.white,
-                                      ),
+                                      child: const Icon(Icons.remove, color: Colors.white),
                                     ),
                                   ),
-
-                                  ///cart quantity
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20, right: 20),
+                                    padding: const EdgeInsets.only(left: 20, right: 20),
                                     child: Text(
-                                      '${int.parse(cartProviders.getProductQuantityById(widget.productDetails['id']).toString())}',
-                                      style: fontStyle(
-                                        18,
-                                        Colors.white,
-                                        FontWeight.w400,
-                                      ),
+                                      '${cartProviders.getProductQuantityById(_product['id'])}',
+                                      style: fontStyle(18, Colors.white, FontWeight.w400),
                                     ),
                                   ),
-
-                                  ///inecrement cart quantity
                                   InkWell(
                                     onTap: () {
                                       setState(() {
-                                        var quantity = cartProviders
-                                            .getProductQuantityById(
-                                          widget.productDetails['id'],
-                                        );
-                                        quantity++;
-
-                                        cartProviders.updateQuantityById(
-                                          widget.productDetails['id'],
-                                          quantity,
-                                        );
+                                        var qty = cartProviders.getProductQuantityById(_product['id']);
+                                        cartProviders.updateQuantityById(_product['id'], qty + 1);
                                       });
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.all(2),
                                       decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.white, width: 2),
+                                        border: Border.all(color: Colors.white, width: 2),
                                         borderRadius: BorderRadius.circular(30),
                                         color: ColorPalette.primaryColor,
                                       ),
-                                      child: const Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                      ),
+                                      child: const Icon(Icons.add, color: Colors.white),
                                     ),
                                   ),
                                 ],
@@ -678,7 +630,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                       SizedBox(height: 15.h),
                       Text(
-                        widget.productDetails['long_desc'] ?? '',
+                        _product['long_desc'] ?? '',
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w400,
