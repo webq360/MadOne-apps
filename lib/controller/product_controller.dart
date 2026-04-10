@@ -44,13 +44,15 @@ Future<void> getCategoryWiseProducts({
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
-
+      final raw = json['products'] is List
+          ? json['products']
+          : (json['products']?['data'] ?? json['data'] ?? []);
       categoryWiseProductsList.assignAll(
-        json['products']?['data'] ?? [],
-      );
-
-      print(
-        'Category Wise Products Loaded: ${categoryWiseProductsList.length}',
+        (raw as List).where((p) =>
+            !_isTrue(p['is_banned']) &&
+            !_isTrue(p['banned']) &&
+            !_isTrue(p['is_hide']) &&
+            !_isTrue(p['hide'])).toList(),
       );
     } else {
       print(

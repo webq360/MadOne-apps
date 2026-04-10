@@ -9,6 +9,7 @@ import 'package:omnicare_app/const/custom_widgets.dart';
 import 'package:omnicare_app/controller/company_controller.dart';
 import 'package:omnicare_app/controller/home_controller.dart';
 import 'package:omnicare_app/controller/product_controller.dart';
+import 'package:omnicare_app/ui/screens/all_featured_categories_screen.dart';
 import 'package:omnicare_app/hive/home_hive/hive_model.dart';
 import 'package:omnicare_app/hive/home_hive/home_hive.dart';
 import 'package:omnicare_app/ui/widgets/category_list.dart';
@@ -169,9 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    setState(() {
-                                      Get.to(() => const SeeAllProductScreen());
-                                    });
+                                    Get.to(() => const AllFeaturedCategoriesScreen());
                                   },
                                   child: Text(
                                     "See all",
